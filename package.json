@@ -2,12 +2,17 @@
   "name": "seriesruntime",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "backend": "nodemon --exec \"npm start -w backend\"",
+    "frontend": "npm run dev -w frontend",
+    "start": "concurrently -k \"npm run backend\" \"npm run frontend\""
   },
   "workspaces": [
     "src/*"
   ],
-  "author": "Antriksh Yadav"
+  "author": "Antriksh Yadav",
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "nodemon": "^3.0.3"
+  }
 }
