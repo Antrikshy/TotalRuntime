@@ -29,10 +29,14 @@ tvdb.interceptors.response.use(res => res, err => {
 })
 
 fastify.get("/search", (request, reply) => {
+  reply.header("Access-Control-Allow-Origin", "*")
+  reply.header("Access-Control-Allow-Methods", "GET")
   const searchQuery = request.query.q.trim()
+  if (!searchQuery) { reply.code(404).send() }
   tvdb.get("/search", { params: { query: searchQuery, type: "series", limit: 5 } }).then(res => {
     const compactResults = res.data["data"].map(result => ({
       "title": result["name"],
+      "year": result["year"],
       "tvdbId": result["tvdb_id"],
       "remoteIds": result["remote_ids"],
       "thumbnail": result["thumbnail"]
@@ -50,7 +54,10 @@ fastify.get("/search", (request, reply) => {
 })
 
 fastify.get("/episodes", (request, reply) => {
+  reply.header("Access-Control-Allow-Origin", "*")
+  reply.header("Access-Control-Allow-Methods", "GET")
   const tvdbId = request.query.id
+  if (!tvdbId) { reply.code(404).send() }
   tvdb.get(`/series/${tvdbId}/episodes/official`, { params: { page: 0 } }).then(res => {
     const compactEpisodes = res.data["data"]?.["episodes"]
       .filter(episode => episode["seasonNumber"] && episode["seasonNumber"] != 0)
