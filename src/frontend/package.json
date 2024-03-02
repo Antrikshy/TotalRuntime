@@ -17,6 +17,9 @@
 	"type": "module",
 	"dependencies": {
 		"axios": "^1.6.7",
-		"humanize-duration": "^3.31.0"
+		"contrast": "^1.0.1",
+		"debounce": "^2.0.0",
+		"humanize-duration": "^3.31.0",
+		"node-vibrant": "^3.1.6"
 	}
 }

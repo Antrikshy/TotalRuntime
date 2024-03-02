@@ -1,152 +1,174 @@
 <style lang="scss">
   main {
-    height: calc(100vh - 6rem);
-    margin: 3rem;
-    display: grid;
-    grid-template-columns: 2fr 3fr;
-    grid-template-rows: 4fr 6fr;
-    background-color: lightblue;
-    grid-template-areas:
-      "poster runtime-summary"
-      "episode-info episode-info";
+    padding: 3rem;
+    box-sizing: border-box;
+    background-color: var(--DarkVibrant);
+    transition: 0.5s;
   }
 
-  .active-series-poster {
-    grid-area: poster;
-
-    .poster {
-      max-height: 100%;
-    }
-  }
-
-  .runtime-summary {
+  .top-area {
     display: flex;
-    flex-direction: column;
-    text-align: center;
-    grid-area: runtime-summary;
+    border-radius: 1.5rem;
+    background-color: var(--Muted);
 
-    .search-area {
-      width: calc(100% - 2rem);
-      padding: 1rem;
-      display: inline-block;
-      box-sizing: border-box;
-      background-color: lightcyan;
-      transition: 0.25s ease-in;
-      &.elevated {
-        transform: scale(1.05);
-      }
+    .active-series-poster {
+      height: 30rem;
+      width: 20rem;
+      z-index: 0;
 
-      .search-bar {
-        height: 2rem;
-        width: calc(100% - 2rem);
-        padding: 1rem;
-        position: relative;
-        border: 1px solid black;
-        border-radius: 5px;
-        font-size: 2rem;
-        transition: 0.15s;
-        &:focus {
-          outline: none;
-          box-shadow: #aaa 0px 5px 15px;
-        }
-      }
-      .search-results {
-        position: absolute;
-        width: 100%;
-
-        .search-result {
-          .poster {
-            height: 4rem;
-          }
-
-          // Is a <button> for accessibility, resetting styles
-          all: initial;
-          font: inherit;
-          color: inherit;
-
-          width: 100%;
-          padding: 0.5rem;
-          display: flex;
-          gap: 1rem;
-          align-items: center;
-          background-color: #fff;
-        }
+      .poster {
+        height: 100%;
+        max-width: 100%;
+        display: block;
+        border-top-left-radius: 1.5rem;
+        border-bottom-left-radius: 1.5rem;
       }
     }
 
-    .active-series-runtime {
-      height: 100%;
-      padding: 3rem;
+    .runtime-summary {
+      flex-grow: 1;
       display: flex;
-      align-items: center;
-      justify-items: center;
+      flex-direction: column;
+      text-align: center;
+      z-index: 1;
 
-      big {
-        font-size: 5rem;
+      .search-area {
+        width: 100%;
+        display: inline-block;
+        box-sizing: border-box;
+
+        &::before {
+          content: "";
+          position: absolute;
+          top: 0;
+          left: 0;
+          backdrop-filter: none;
+          -webkit-backdrop-filter: none;
+          transition: 0.15s ease-in;
+        }
+        &.elevated {
+          &::before {
+            height: 100vh;
+            width: 100vw;
+            backdrop-filter: blur(15px) saturate(65%);
+            -webkit-backdrop-filter: blur(15px) saturate(65%);
+          }
+        }
+      }
+
+      .active-series-runtime {
+        height: 26rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-bottom-right-radius: 1.5rem;
+        background: linear-gradient(to right, transparent, 10%, var(--Muted) 25%);
+        color: var(--RuntimeSummaryTextColor);
+
+        big {
+          font-size: 3rem;
+        }
       }
     }
   }
 
-  .active-series-episodes {
-    grid-area: episode-info;
-    background-color: lightcoral;
+  .bottom-area {
+    margin-top: 1.5rem;
+    padding: 3rem;
+    border-radius: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    background-color: var(--Muted);
+    transition: 0.5s;
+
+    .season {
+      height: 20rem;
+      width: 20rem;
+      padding: 1rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      background-color: #fff;
+
+      .episode-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        justify-content: center;
+        overflow-x: scroll;
+
+        .episode {
+          width: 5rem;
+          display: inline;
+        }
+      }
+    }
   }
 </style>
 
 <script>
-  // @hmr:keep-all
-
-  import axios from "axios"
   import humanizeDuration from "humanize-duration"
+  import Vibrant from "node-vibrant"
+  import contrast from "contrast"
 
-  // Raw data
+  import Search from "./Search.svelte"
+
   let activeSeries = null
-  let searchResults = []
   let selectedSeries = []
 
-  // Processed data for render cycle
-  let activeSeriesHumanizedRuntime = ""
-  let activeSeriesEpisodesBySeason = {}
-
-  // Form fields
   let searchQuery = ""
 
-  function fetchSearchResults() {
-    /* Uses current value of searchQuery */
-    axios.get(`${window.location.protocol}//${window.location.hostname}:3000/search?q=${searchQuery}`).then(res => {
-      searchResults = res.data
-    }).catch(err => {
-      // TODO
-      console.error(err)
-    })
+  let paletteDarkMuted
+  let paletteDarkVibrant
+  let paletteLightMuted
+  let paletteLightVibrant
+  let paletteMuted
+  let paletteVibrant
+  let paletteRuntimeSummaryTextColor
+
+  function handleFoundSeriesMetadata(e) {
+    const series = e.detail
+    activeSeries = series
+    selectedSeries.push(series)
   }
 
-  function fetchEpisodeMetadata() {
-    /* Uses current activeSeries */
-    axios.get(`${window.location.protocol}//${window.location.hostname}:3000/episodes?id=${activeSeries.tvdbId}`).then(res => {
-      activeSeries.episodes = res.data  // Also updates selectedSeries by reference
-    }).catch(err => {
-      // TODO
-      console.error(err)
-    })
+  function handleFoundSeriesEpisodes(e) {
+    const episodes = e.detail
+    activeSeries.episodes = episodes  // Also updates selectedSeries by reference
   }
 
-  function selectTitle(result) {
-    activeSeries = result
-    selectedSeries.push(result)
-    searchQuery = ""
-    searchResults = []
-    activeSeriesHumanizedRuntime = ""
-    activeSeriesEpisodesBySeason = {}
-    fetchEpisodeMetadata()
+  async function inferColorPalette() {
+    const palette = await Vibrant.from(activeSeries.thumbnail).getPalette()
+    paletteDarkMuted = palette["DarkMuted"]?.hex
+    paletteDarkVibrant = palette["DarkVibrant"]?.hex
+    paletteLightMuted = palette["LightMuted"]?.hex
+    paletteLightVibrant = palette["LightVibrant"]?.hex
+    paletteMuted = palette["Muted"]?.hex
+    paletteVibrant = palette["Vibrant"]?.hex
+    if (contrast(paletteMuted) === "dark") {
+      paletteRuntimeSummaryTextColor = "#fff"
+    } else {
+      paletteRuntimeSummaryTextColor = "#000"
+    }
   }
 
-  $: if (activeSeries?.episodes) {
-    activeSeriesHumanizedRuntime = humanizeDuration(
+  function humanizeRuntime(runtimeMinutes, largest=2) {
+    return humanizeDuration(
       // humanize-duration accepts milliseconds
-      activeSeries.episodes.reduce((total, ep) => total + ep.runtime, 0) * 60 * 1000,
+      runtimeMinutes * 60 * 1000,
       { largest: 2, round: true, conjunction: " and ", serialComma: false }
     )
+  }
+
+  let activeSeriesHumanizedRuntime = ""
+  let activeSeriesEpisodesBySeason = {}
+  $: if (activeSeries?.episodes) {
+    activeSeriesHumanizedRuntime = humanizeRuntime(activeSeries.episodes.reduce((total, ep) => total + ep.runtime, 0))
+    activeSeriesEpisodesBySeason = {}
     activeSeries.episodes.forEach(ep => {
       const { season, episode } = ep
       if (!activeSeriesEpisodesBySeason[season]) {
@@ -158,66 +180,72 @@
       activeSeriesEpisodesBySeason[season]["episodes"][episode] = ep
       activeSeriesEpisodesBySeason[season]["totalRuntime"] += ep.runtime
     })
+    if (activeSeries.thumbnail) {
+      inferColorPalette()
+    }
   }
 </script>
 
-<main>
-  <section class="active-series-poster">
-    {#if activeSeries}
-      <img src={activeSeries.thumbnail} class="poster" alt="Poster for {activeSeries.title} ({activeSeries.year})"/>
-    {:else}
-      <img src="https://placehold.co/400x600.png" class="poster" alt="Placeholder poster"/>
-    {/if}
-  </section>
-  <section class="runtime-summary">
-    <aside class="search-area {searchQuery.length ? "elevated" : ""}">
-      <form role="search" on:submit={fetchSearchResults}>
-        <input
-          type="text"
-          class="search-bar"
-          placeholder="Search"
-          autocomplete="off"
-          autocorrect="off"
-          autocapitalize="off"
-          bind:value={searchQuery}
+<main style="
+  --DarkMuted: {paletteDarkMuted};
+  --DarkVibrant: {paletteDarkVibrant};
+  --LightMuted: {paletteLightMuted};
+  --LightVibrant: {paletteLightVibrant};
+  --Muted: {paletteMuted};
+  --Vibrant: {paletteVibrant};
+  --RuntimeSummaryTextColor: {paletteRuntimeSummaryTextColor};
+">
+  <section class="top-area">
+    <section class="active-series-poster">
+      {#if activeSeries}
+        <img src={activeSeries.thumbnail} class="poster" alt="Poster for {activeSeries.title} ({activeSeries.year})"
         />
-      </form>
-      {#if searchResults.length}
-        <div class="search-results">
-          {#each searchResults as result}
-            <button class="search-result" on:click={_ => selectTitle(result)}>
-              <img src={result.thumbnail || "https://placehold.co/40x60.png"} class="poster" alt="Poster for {result.title} ({result.year})"/>
-              <span>
-                <strong>{result.title}</strong>
-                <br>
-                {result.year}
-              </span>
-            </button>
-          {/each}
-        </div>
-      {/if}
-    </aside>
-    <section class="active-series-runtime">
-      {#if activeSeriesHumanizedRuntime}
-        <big>It will take you {activeSeriesHumanizedRuntime} to watch {activeSeries.title}</big>
       {:else}
-        <strong>Search to begin.</strong>
+        <div class="poster"/>
       {/if}
     </section>
+    <summary class="runtime-summary">
+      <aside class="search-area {searchQuery.length ? "elevated" : ""}">
+        <Search
+          bind:searchQuery
+          on:resultSeries={handleFoundSeriesMetadata}
+          on:resultEpisodes={handleFoundSeriesEpisodes}
+        />
+      </aside>
+      <section class="active-series-runtime">
+        {#if activeSeriesHumanizedRuntime}
+          <big>
+            It will take you
+            <br/>
+            <strong>{activeSeriesHumanizedRuntime}</strong>
+            <br/>
+            to watch
+            <br/>
+            <strong>{activeSeries.title}</strong>
+          </big>
+        {:else}
+          <strong>Search to begin.</strong>
+        {/if}
+      </section>
+    </summary>
   </section>
-  <div class="active-series-episodes">
+  <section class="bottom-area">
     {#if (Object.keys(activeSeriesEpisodesBySeason).length)}
       {#each Object.entries(activeSeriesEpisodesBySeason) as [seasonNum, season]}
-        <div>
-          {seasonNum}
-          <br/>
-          <span>{season.totalRuntime}</span>
-          <br/>
-          {#each Object.values(season.episodes) as episode}
-            <div>{JSON.stringify(episode)}</div>
-          {/each}
+        <div class="season">
+          <div><strong>Season {seasonNum}</strong></div>
+          <div>{humanizeRuntime(season.totalRuntime)}</div>
+          <div class="episode-list">
+            {#each Object.values(season.episodes) as episode}
+              <div class="episode">
+                <strong>Episode {episode.episode}</strong>
+                <br/>
+                {episode.runtime} minutes
+              </div>
+            {/each}
+          </div>
         </div>
       {/each}
     {/if}
-  </div>
+  </section>
 </main>
