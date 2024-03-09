@@ -5,28 +5,33 @@
     padding: 1rem;
     position: relative;
     box-sizing: border-box;
-    border: 2px solid #ddd;
+    border: none;
     border-radius: 1rem;
     font-size: 2rem;
+    // TODO
+    font-family: "Pathway Extreme", sans-serif;
     transition: 0.15s;
-    &:not(.elevated) {
-      border-left: none;
+    &:not(.elevated):not(.fresh-start) {
       border-radius: unset;
       border-top-right-radius: 1rem;
     }
-    &:focus {
+    &:focus,
+    &.fresh-start {
       outline: none;
-      box-shadow: #aaa 0px 5px 15px;
+      box-shadow:
+        #3b3b3b80 0px 3px 10px,
+        #3b3b3b10 0px -2px 3px 2px inset;
     }
   }
 
   .search-results {
-    min-width: 50rem;
+    width: 100%;
     margin-top: 1rem;
     position: absolute;
     box-sizing: border-box;
     border-radius: 1rem;
     background-color: #fff;
+    box-shadow: #3b3b3b80 0px 3px 10px;
 
     .search-result {
       .poster {
@@ -38,6 +43,7 @@
       font: inherit;
       color: inherit;
 
+      min-height: 5rem;
       width: 100%;
       padding: 0.5rem 1rem;
       margin: 0.5rem 0;
@@ -63,6 +69,8 @@
   const dispatch = createEventDispatcher()
 
   export let searchQuery;
+  export let freshStart = true;
+
   let searchResults = []
 
   function fetchSearchResults() {
@@ -80,7 +88,6 @@
   }
 
   function fetchEpisodeMetadata(id) {
-    /* Uses current activeSeries */
     if (!id) return
     axios.get(`${window.location.protocol}//${window.location.hostname}:3000/episodes?id=${id}`).then(res => {
       dispatch("resultEpisodes", res.data)
@@ -101,12 +108,17 @@
 <form role="search" on:submit={fetchSearchResults}>
   <input
     type="text"
-    class={"search-bar" + (searchQuery.length ? " elevated" : "")}
-    placeholder="Search"
+    class={"search-bar" + (searchQuery.length || freshStart ? " elevated" : "") + (freshStart ? " fresh-start" : "")}
+    placeholder="Search for series"
     autocomplete="off"
     autocorrect="off"
     autocapitalize="off"
     bind:value={searchQuery}
+    on:keypress={e => {
+      if (e.key == "Escape") {
+        searchQuery = ""
+      }
+    }}
     on:input={debounce(fetchSearchResults, 500)}
   />
 </form>
@@ -114,11 +126,13 @@
   <div class="search-results">
     {#each searchResults as result}
       <button class="search-result" on:click={_ => selectTitle(result)}>
-        <img src={result.thumbnail || "https://placehold.co/40x60.png"} class="poster" alt="Poster for {result.title} ({result.year})"/>
+        {#if result.thumbnail}
+          <img src={result.thumbnail} class="poster" alt="Poster for {result.title}"/>
+        {/if}
         <span>
           <strong>{result.title}</strong>
           <br>
-          {result.year}
+          {result.year ?? ""}
         </span>
       </button>
     {/each}

@@ -14,7 +14,7 @@ const tvdb = axios.create({
 })
 tvdb.interceptors.response.use(res => res, err => {
   if (err.response.status == 401) {
-    return axios.post("https://api4.thetvdb.com/v4/login", { "apikey": "" }).then(res => {
+    return axios.post("https://api4.thetvdb.com/v4/login", { "apikey": process.env.TVDB_API_KEY }).then(res => {
       const token = res.data?.["data"]?.["token"]
       tvdb.defaults.headers.common['Authorization'] = `Bearer ${token}`
       // Retry the original request

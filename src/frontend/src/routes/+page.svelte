@@ -1,24 +1,40 @@
 <style lang="scss">
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Gilda+Display&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Literata:ital,opsz,wght@0,7..72,200..900;1,7..72,200..900&family=Pathway+Extreme:ital,opsz,wght@0,8..144,100..900;1,8..144,100..900&display=swap');
+
   main {
+    min-height: 100vh;
     padding: 3rem;
     box-sizing: border-box;
     background-color: var(--DarkVibrant);
     transition: 0.5s;
+
+    // TODO
+    font-family: "Pathway Extreme", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+  }
+
+  .top-area,
+  .bottom-area {
+    border-radius: 1.5rem;
+    background-color: var(--Muted);
+    transition: 0.5s;
+    &:not(.fresh-start) {
+      box-shadow:#00000080 0px 3px 15px;
+    }
   }
 
   .top-area {
     display: flex;
-    border-radius: 1.5rem;
-    background-color: var(--Muted);
 
     .active-series-poster {
       height: 30rem;
-      width: 20rem;
+      max-width: 21rem;
       z-index: 0;
 
       .poster {
         height: 100%;
-        max-width: 100%;
         display: block;
         border-top-left-radius: 1.5rem;
         border-bottom-left-radius: 1.5rem;
@@ -36,10 +52,10 @@
         width: 100%;
         display: inline-block;
         box-sizing: border-box;
-
+        position: relative;
         &::before {
           content: "";
-          position: absolute;
+          position: fixed;
           top: 0;
           left: 0;
           backdrop-filter: none;
@@ -57,16 +73,30 @@
       }
 
       .active-series-runtime {
-        height: 26rem;
+        height: 24rem;
+        padding: 1rem;
         display: flex;
         align-items: center;
         justify-content: center;
         border-bottom-right-radius: 1.5rem;
         background: linear-gradient(to right, transparent, 10%, var(--Muted) 25%);
-        color: var(--RuntimeSummaryTextColor);
+        color: var(--MutedTextColor);
+
+        // TODO
+        font-family: "Gilda Display", serif;
+        font-optical-sizing: auto;
+        // font-weight: 600;
+        font-style: normal;
+        line-height: 3.5rem;
 
         big {
-          font-size: 3rem;
+          font-size: 3.5rem;
+
+          strong {
+            font-family: "Libre Baskerville", serif;
+            font-family: "DM Serif Display", serif;
+            font-weight: 800;
+          }
         }
       }
     }
@@ -74,48 +104,18 @@
 
   .bottom-area {
     margin-top: 1.5rem;
-    padding: 3rem;
-    border-radius: 1.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 1rem;
-    background-color: var(--Muted);
-    transition: 0.5s;
-
-    .season {
-      height: 20rem;
-      width: 20rem;
-      padding: 1rem 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 1rem;
-      background-color: #fff;
-
-      .episode-list {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 1rem;
-        justify-content: center;
-        overflow-x: scroll;
-
-        .episode {
-          width: 5rem;
-          display: inline;
-        }
-      }
-    }
+    padding: 2rem;
   }
 </style>
 
 <script>
-  import humanizeDuration from "humanize-duration"
   import Vibrant from "node-vibrant"
-  import contrast from "contrast"
+  import { textContrast } from "text-contrast"
+
+  import { humanizeRuntime } from "$lib/util.js"
 
   import Search from "./Search.svelte"
+  import Seasons from "./Seasons.svelte"
 
   let activeSeries = null
   let selectedSeries = []
@@ -128,7 +128,7 @@
   let paletteLightVibrant
   let paletteMuted
   let paletteVibrant
-  let paletteRuntimeSummaryTextColor
+  let paletteMutedTextColor
 
   function handleFoundSeriesMetadata(e) {
     const series = e.detail
@@ -149,19 +149,11 @@
     paletteLightVibrant = palette["LightVibrant"]?.hex
     paletteMuted = palette["Muted"]?.hex
     paletteVibrant = palette["Vibrant"]?.hex
-    if (contrast(paletteMuted) === "dark") {
-      paletteRuntimeSummaryTextColor = "#fff"
+    if (textContrast.isLightOrDark(paletteMuted) === "dark") {
+      paletteMutedTextColor = "#fff"
     } else {
-      paletteRuntimeSummaryTextColor = "#000"
+      paletteMutedTextColor = "#000"
     }
-  }
-
-  function humanizeRuntime(runtimeMinutes, largest=2) {
-    return humanizeDuration(
-      // humanize-duration accepts milliseconds
-      runtimeMinutes * 60 * 1000,
-      { largest: 2, round: true, conjunction: " and ", serialComma: false }
-    )
   }
 
   let activeSeriesHumanizedRuntime = ""
@@ -193,13 +185,12 @@
   --LightVibrant: {paletteLightVibrant};
   --Muted: {paletteMuted};
   --Vibrant: {paletteVibrant};
-  --RuntimeSummaryTextColor: {paletteRuntimeSummaryTextColor};
+  --MutedTextColor: {paletteMutedTextColor};
 ">
-  <section class="top-area">
+  <section class="top-area {activeSeries == null ? " fresh-start" : ""}">
     <section class="active-series-poster">
-      {#if activeSeries}
-        <img src={activeSeries.thumbnail} class="poster" alt="Poster for {activeSeries.title} ({activeSeries.year})"
-        />
+      {#if activeSeries?.thumbnail}
+        <img src={activeSeries.thumbnail} class="poster" alt="Poster for {activeSeries.title} ({activeSeries.year})"/>
       {:else}
         <div class="poster"/>
       {/if}
@@ -207,6 +198,7 @@
     <summary class="runtime-summary">
       <aside class="search-area {searchQuery.length ? "elevated" : ""}">
         <Search
+          freshStart={activeSeries == null}
           bind:searchQuery
           on:resultSeries={handleFoundSeriesMetadata}
           on:resultEpisodes={handleFoundSeriesEpisodes}
@@ -224,28 +216,14 @@
             <strong>{activeSeries.title}</strong>
           </big>
         {:else}
-          <strong>Search to begin.</strong>
+          <big>Search to begin.</big>
         {/if}
       </section>
     </summary>
   </section>
-  <section class="bottom-area">
+  <section class="bottom-area {activeSeries == null ? " fresh-start" : ""}">
     {#if (Object.keys(activeSeriesEpisodesBySeason).length)}
-      {#each Object.entries(activeSeriesEpisodesBySeason) as [seasonNum, season]}
-        <div class="season">
-          <div><strong>Season {seasonNum}</strong></div>
-          <div>{humanizeRuntime(season.totalRuntime)}</div>
-          <div class="episode-list">
-            {#each Object.values(season.episodes) as episode}
-              <div class="episode">
-                <strong>Episode {episode.episode}</strong>
-                <br/>
-                {episode.runtime} minutes
-              </div>
-            {/each}
-          </div>
-        </div>
-      {/each}
+      <Seasons activeSeriesEpisodesBySeason={activeSeriesEpisodesBySeason}/>
     {/if}
   </section>
 </main>
