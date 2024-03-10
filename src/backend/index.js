@@ -39,13 +39,37 @@ fastify.get("/search", (request, reply) => {
       "year": result["year"],
       "tvdbId": result["tvdb_id"],
       "remoteIds": result["remote_ids"],
-      "thumbnail": result["thumbnail"]
+      "thumbnail": result["thumbnail"],
+      "slug": `${result["tvdb_id"]}-${result["slug"]}`
     })).filter(Boolean)
     if (compactResults.length) {
       reply.send(compactResults)
     } else {
       reply.code(204).send()
     }
+  }).catch(err => {
+    // TODO
+    fastify.log.error(err.response.status)
+    reply.code(500).send("Internal server error")
+  })
+})
+
+fastify.get("/series", (request, reply) => {
+  reply.header("Access-Control-Allow-Origin", "*")
+  reply.header("Access-Control-Allow-Methods", "GET")
+  const tvdbId = request.query.id
+  if (!tvdbId) { reply.code(404).send() }
+  tvdb.get(`/series/${tvdbId}/extended`, { params: { short: true } }).then(res => {
+    const rawResult = res.data["data"]
+    // TODO: What if nothing found?
+    reply.send({
+      "title": rawResult["translations"]?.["eng"] ?? rawResult["name"],
+      "year": rawResult["year"],
+      "tvdbId": rawResult["id"],
+      "remoteIds": rawResult["remote_ids"],
+      "thumbnail": rawResult["image"],
+      "slug": `${rawResult["id"]}-${rawResult["slug"]}`
+    })
   }).catch(err => {
     // TODO
     fastify.log.error(err.response.status)

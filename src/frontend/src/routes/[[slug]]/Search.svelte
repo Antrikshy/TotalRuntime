@@ -62,16 +62,24 @@
 </style>
 
 <script>
+  import { afterNavigate } from "$app/navigation";
+  import { page } from "$app/stores"
+
   import axios from "axios"
-  import debounce from 'debounce'
-  import { createEventDispatcher } from 'svelte'
+  import debounce from "debounce"
+  import { createEventDispatcher } from "svelte"
 
   const dispatch = createEventDispatcher()
 
-  export let searchQuery;
-  export let freshStart = true;
+  export let searchQuery
+  export let freshStart = true
 
   let searchResults = []
+
+  afterNavigate(e => {
+    const tvdbId = e.to.params.slug.split("-")[0]
+    fetchSeriesMetadata(tvdbId)
+  })
 
   function fetchSearchResults() {
     if (searchQuery.length < 3) {
@@ -79,8 +87,18 @@
       return
     }
     /* Uses current value of searchQuery */
-    axios.get(`${window.location.protocol}//${window.location.hostname}:3000/search?q=${searchQuery}`).then(res => {
+    axios.get(`${$page.url.protocol}//${$page.url.hostname}:3000/search?q=${searchQuery}`).then(res => {
       searchResults = res.data
+    }).catch(err => {
+      // TODO
+      console.error(err)
+    })
+  }
+
+  function fetchSeriesMetadata(id) {
+    if (!id) return
+    axios.get(`${$page.url.protocol}//${$page.url.hostname}:3000/series?id=${id}`).then(res => {
+      selectTitle(res.data)
     }).catch(err => {
       // TODO
       console.error(err)
@@ -89,7 +107,7 @@
 
   function fetchEpisodeMetadata(id) {
     if (!id) return
-    axios.get(`${window.location.protocol}//${window.location.hostname}:3000/episodes?id=${id}`).then(res => {
+    axios.get(`${$page.url.protocol}//${$page.url.hostname}:3000/episodes?id=${id}`).then(res => {
       dispatch("resultEpisodes", res.data)
     }).catch(err => {
       // TODO
@@ -102,6 +120,7 @@
     searchQuery = ""
     searchResults = []
     fetchEpisodeMetadata(result.tvdbId)
+    dispatch("newUrlPath", result.slug)
   }
 </script>
 

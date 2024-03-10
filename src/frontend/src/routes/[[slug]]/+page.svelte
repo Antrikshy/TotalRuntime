@@ -109,6 +109,9 @@
 </style>
 
 <script>
+  import { goto } from "$app/navigation"
+  import { page } from "$app/stores"
+
   import Vibrant from "node-vibrant"
   import { textContrast } from "text-contrast"
 
@@ -118,7 +121,7 @@
   import Seasons from "./Seasons.svelte"
 
   let activeSeries = null
-  let selectedSeries = []
+  let selectedSeries = {}
 
   let searchQuery = ""
 
@@ -130,10 +133,16 @@
   let paletteVibrant
   let paletteMutedTextColor
 
+  function handleShallowRouting(e) {
+    if ($page.params.slug != e.detail) {
+      goto(e.detail)
+    }
+  }
+
   function handleFoundSeriesMetadata(e) {
     const series = e.detail
     activeSeries = series
-    selectedSeries.push(series)
+    selectedSeries[series.tvdbId] = series
   }
 
   function handleFoundSeriesEpisodes(e) {
@@ -200,6 +209,7 @@
         <Search
           freshStart={activeSeries == null}
           bind:searchQuery
+          on:newUrlPath={handleShallowRouting}
           on:resultSeries={handleFoundSeriesMetadata}
           on:resultEpisodes={handleFoundSeriesEpisodes}
         />
