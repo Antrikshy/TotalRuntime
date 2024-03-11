@@ -54,8 +54,8 @@
       cursor: pointer;
 
       &:hover {
-        background-color: #888;
-        color: #fff;
+        background-color: var(--DarkVibrant);
+        color: var(--DarkVibrantTextColor);
       }
     }
   }

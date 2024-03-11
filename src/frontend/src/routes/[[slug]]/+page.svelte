@@ -6,10 +6,11 @@
     // ::selection
 
     min-height: 100vh;
-    padding: 3rem;
+    padding: 1rem 3rem;
     box-sizing: border-box;
+    position: relative;
     background-color: var(--DarkVibrant);
-    transition: 0.5s;
+    transition: 0.25s;
 
     // TODO
     font-family: "Pathway Extreme", sans-serif;
@@ -18,12 +19,19 @@
     font-style: normal;
   }
 
+  h1 {
+    text-align: center;
+    margin-top: 0;
+    cursor: default;
+    color: var(--DarkVibrantTextColor);
+  }
+
   .top-area,
   .bottom-area {
     margin-right: 2rem;
     border-radius: 1.5rem;
     background-color: var(--Muted);
-    transition: 0.5s;
+    transition: 0.25s;
     &:not(.fresh-start) {
       box-shadow:#00000080 0px 3px 15px;
     }
@@ -109,6 +117,7 @@
 
   .bottom-area {
     margin-top: 1.5rem;
+    margin-bottom: 2.5rem;
     padding: 2rem;
   }
 
@@ -127,6 +136,16 @@
     writing-mode: vertical-lr;
     background-color: lightcoral;
     cursor: pointer;
+  }
+
+  footer {
+    width: calc(100vw - 6rem);
+    margin: 1rem 0;
+    position: absolute;
+    bottom: 0;
+    box-sizing: border-box;
+    text-align: center;
+    color: var(--DarkVibrantTextColor);
   }
 </style>
 
@@ -157,6 +176,7 @@
   let paletteMuted
   let paletteVibrant
   let paletteMutedTextColor
+  let paletteDarkVibrantTextColor
 
   afterNavigate(e => {
     const slug = e?.to?.params?.slug
@@ -206,11 +226,8 @@
     paletteLightVibrant = palette["LightVibrant"]?.hex
     paletteMuted = palette["Muted"]?.hex
     paletteVibrant = palette["Vibrant"]?.hex
-    if (textContrast.isLightOrDark(paletteMuted) === "dark") {
-      paletteMutedTextColor = "#fff"
-    } else {
-      paletteMutedTextColor = "#000"
-    }
+    paletteMutedTextColor = textContrast.isLightOrDark(paletteMuted) === "dark" ? "#fff" : "#000"
+    paletteDarkVibrantTextColor = textContrast.isLightOrDark(paletteDarkVibrant) === "dark" ? "#fff" : "#000"
   }
 
   let activeSeriesHumanizedRuntime = ""
@@ -243,7 +260,9 @@
   --Muted: {paletteMuted};
   --Vibrant: {paletteVibrant};
   --MutedTextColor: {paletteMutedTextColor};
+  --DarkVibrantTextColor: {paletteDarkVibrantTextColor};
 ">
+  <h1>Total Runtime</h1>
   {#if !inCompareMode}
     <!-- TODO: Figure out staggered scaling -->
     <div role="presentation" transition:scale={{ start: 0.8, opacity: 0.8 }}>
@@ -277,6 +296,7 @@
                 <strong>{activeSeries.title}</strong>
               </big>
             {:else}
+              <strong>Check and compare TV series runtimes, by season or in their entirety.</strong>
               <big>Search to begin.</big>
             {/if}
           </section>
@@ -311,4 +331,7 @@
       }}
     />
   {/if}
+  <footer>
+    <small>Designed by Antriksh Yadav. Source <a href="https://github.com/Antrikshy/TotalRuntime" target="_blank">on GitHub</a>. Data from TheTVDB.</small>
+  </footer>
 </main>
