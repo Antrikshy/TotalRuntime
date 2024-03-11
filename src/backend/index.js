@@ -58,7 +58,7 @@ fastify.get("/series", (request, reply) => {
   reply.header("Access-Control-Allow-Origin", "*")
   reply.header("Access-Control-Allow-Methods", "GET")
   const tvdbId = request.query.id
-  if (!tvdbId) { reply.code(404).send() }
+  if (!tvdbId || isNaN(tvdbId)) { reply.code(404).send() }
   tvdb.get(`/series/${tvdbId}/extended`, { params: { short: true } }).then(res => {
     const rawResult = res.data["data"]
     // TODO: What if nothing found?
@@ -81,7 +81,7 @@ fastify.get("/episodes", (request, reply) => {
   reply.header("Access-Control-Allow-Origin", "*")
   reply.header("Access-Control-Allow-Methods", "GET")
   const tvdbId = request.query.id
-  if (!tvdbId) { reply.code(404).send() }
+  if (!tvdbId || isNaN(tvdbId)) { reply.code(404).send() }
   tvdb.get(`/series/${tvdbId}/episodes/official`, { params: { page: 0 } }).then(res => {
     const compactEpisodes = res.data["data"]?.["episodes"]
       .filter(episode =>

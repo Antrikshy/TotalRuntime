@@ -41,6 +41,7 @@
     <summary class="season-summary">
       <div><big>Season {seasonNum}</big></div>
       <div><small>{humanizeRuntime(season.totalRuntime)}</small></div>
+      <div><small>{season.episodes.length} episodes</small></div>
     </summary>
     <div class="episode-list">
       {#each Object.values(season.episodes) as episode}

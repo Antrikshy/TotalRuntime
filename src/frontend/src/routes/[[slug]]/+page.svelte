@@ -2,6 +2,9 @@
   @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Gilda+Display&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Literata:ital,opsz,wght@0,7..72,200..900;1,7..72,200..900&family=Pathway+Extreme:ital,opsz,wght@0,8..144,100..900;1,8..144,100..900&display=swap');
 
   main {
+    // TODO
+    // ::selection
+
     min-height: 100vh;
     padding: 3rem;
     box-sizing: border-box;
@@ -17,6 +20,7 @@
 
   .top-area,
   .bottom-area {
+    margin-right: 2rem;
     border-radius: 1.5rem;
     background-color: var(--Muted);
     transition: 0.5s;
@@ -76,6 +80,7 @@
         height: 24rem;
         padding: 1rem;
         display: flex;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
         border-bottom-right-radius: 1.5rem;
@@ -106,10 +111,28 @@
     margin-top: 1.5rem;
     padding: 2rem;
   }
+
+  .compare-screen-pull-tab {
+    height: 50vh;
+    min-height: 12rem;
+    width: 3rem;
+    position: fixed;
+    top: 25vh;
+    right: 0;
+    border-top-left-radius: 1.5rem;
+    border-bottom-left-radius: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    writing-mode: vertical-lr;
+    background-color: lightcoral;
+    cursor: pointer;
+  }
 </style>
 
 <script>
-  import { goto } from "$app/navigation"
+  import { scale, fly } from "svelte/transition"
+  import { goto, afterNavigate } from "$app/navigation"
   import { page } from "$app/stores"
 
   import Vibrant from "node-vibrant"
@@ -119,9 +142,11 @@
 
   import Search from "./Search.svelte"
   import Seasons from "./Seasons.svelte"
+  import Compare from "./Compare.svelte"
 
   let activeSeries = null
   let selectedSeries = {}
+  let inCompareMode = false
 
   let searchQuery = ""
 
@@ -132,6 +157,28 @@
   let paletteMuted
   let paletteVibrant
   let paletteMutedTextColor
+
+  afterNavigate(e => {
+    const slug = e?.to?.params?.slug
+    if (slug == "compare") {
+      showCompareScreen(true)
+    } else {
+      showCompareScreen(false)
+    }
+    if (slug == "") {
+      activeSeries = null
+    }
+  })
+
+  function showCompareScreen(show) {
+    if (inCompareMode == show) { return; }
+    if (show) {
+      inCompareMode = true
+      handleShallowRouting({detail: "compare"})
+    } else {
+      inCompareMode = false
+    }
+  }
 
   function handleShallowRouting(e) {
     if ($page.params.slug != e.detail) {
@@ -148,6 +195,7 @@
   function handleFoundSeriesEpisodes(e) {
     const episodes = e.detail
     activeSeries.episodes = episodes  // Also updates selectedSeries by reference
+    activeSeries.totalRuntime = episodes.reduce((total, ep) => total + ep.runtime, 0)
   }
 
   async function inferColorPalette() {
@@ -168,7 +216,7 @@
   let activeSeriesHumanizedRuntime = ""
   let activeSeriesEpisodesBySeason = {}
   $: if (activeSeries?.episodes) {
-    activeSeriesHumanizedRuntime = humanizeRuntime(activeSeries.episodes.reduce((total, ep) => total + ep.runtime, 0))
+    activeSeriesHumanizedRuntime = humanizeRuntime(activeSeries.totalRuntime)
     activeSeriesEpisodesBySeason = {}
     activeSeries.episodes.forEach(ep => {
       const { season, episode } = ep
@@ -196,44 +244,71 @@
   --Vibrant: {paletteVibrant};
   --MutedTextColor: {paletteMutedTextColor};
 ">
-  <section class="top-area {activeSeries == null ? " fresh-start" : ""}">
-    <section class="active-series-poster">
-      {#if activeSeries?.thumbnail}
-        <img src={activeSeries.thumbnail} class="poster" alt="Poster for {activeSeries.title} ({activeSeries.year})"/>
-      {:else}
-        <div class="poster"/>
-      {/if}
-    </section>
-    <summary class="runtime-summary">
-      <aside class="search-area {searchQuery.length ? "elevated" : ""}">
-        <Search
-          freshStart={activeSeries == null}
-          bind:searchQuery
-          on:newUrlPath={handleShallowRouting}
-          on:resultSeries={handleFoundSeriesMetadata}
-          on:resultEpisodes={handleFoundSeriesEpisodes}
-        />
-      </aside>
-      <section class="active-series-runtime">
-        {#if activeSeriesHumanizedRuntime}
-          <big>
-            It will take you
-            <br/>
-            <strong>{activeSeriesHumanizedRuntime}</strong>
-            <br/>
-            to watch
-            <br/>
-            <strong>{activeSeries.title}</strong>
-          </big>
-        {:else}
-          <big>Search to begin.</big>
+  {#if !inCompareMode}
+    <!-- TODO: Figure out staggered scaling -->
+    <div role="presentation" transition:scale={{ start: 0.8, opacity: 0.8 }}>
+      <section class="top-area {activeSeries == null ? " fresh-start" : ""}">
+        <section class="active-series-poster">
+          {#if activeSeries?.thumbnail}
+            <img src={activeSeries.thumbnail} class="poster" alt="Poster for {activeSeries.title} ({activeSeries.year})"/>
+          {:else}
+            <div class="poster"/>
+          {/if}
+        </section>
+        <summary class="runtime-summary">
+          <aside class="search-area {searchQuery.length ? "elevated" : ""}">
+            <Search
+              freshStart={activeSeries == null}
+              bind:searchQuery
+              on:newUrlPath={handleShallowRouting}
+              on:resultSeries={handleFoundSeriesMetadata}
+              on:resultEpisodes={handleFoundSeriesEpisodes}
+            />
+          </aside>
+          <section class="active-series-runtime">
+            {#if activeSeriesHumanizedRuntime}
+              <big>
+                It will take you
+                <br/>
+                <strong>{activeSeriesHumanizedRuntime}</strong>
+                <br/>
+                to watch
+                <br/>
+                <strong>{activeSeries.title}</strong>
+              </big>
+            {:else}
+              <big>Search to begin.</big>
+            {/if}
+          </section>
+        </summary>
+      </section>
+      <section
+        class="bottom-area {activeSeries == null ? " fresh-start" : ""}"
+        out:scale={{ start: 0.8, opacity: 0.5 }}
+        in:scale={{ start: 0.8, opacity: 0.5 }}
+      >
+        {#if (Object.keys(activeSeriesEpisodesBySeason).length)}
+          <Seasons activeSeriesEpisodesBySeason={activeSeriesEpisodesBySeason}/>
         {/if}
       </section>
-    </summary>
-  </section>
-  <section class="bottom-area {activeSeries == null ? " fresh-start" : ""}">
-    {#if (Object.keys(activeSeriesEpisodesBySeason).length)}
-      <Seasons activeSeriesEpisodesBySeason={activeSeriesEpisodesBySeason}/>
-    {/if}
-  </section>
+    </div>
+  {/if}
+  {#if Object.keys(selectedSeries).length > 1 && !inCompareMode}
+    <nav
+      class="compare-screen-pull-tab"
+      on:click={_ => showCompareScreen(true)}
+      in:fly={{ x: "100vw", duration: 250 }}
+    >
+      Compare {Object.keys(selectedSeries).length} series
+    </nav>
+  {/if}
+  {#if inCompareMode}
+    <Compare
+      bind:selectedSeries
+      on:closeCompareScreen={_ => {
+        history.back()
+        showCompareScreen(false)
+      }}
+    />
+  {/if}
 </main>

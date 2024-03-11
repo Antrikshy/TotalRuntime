@@ -62,12 +62,12 @@
 </style>
 
 <script>
-  import { afterNavigate } from "$app/navigation";
+  import { createEventDispatcher } from "svelte"
+  import { afterNavigate } from "$app/navigation"
   import { page } from "$app/stores"
 
   import axios from "axios"
   import debounce from "debounce"
-  import { createEventDispatcher } from "svelte"
 
   const dispatch = createEventDispatcher()
 
@@ -77,8 +77,10 @@
   let searchResults = []
 
   afterNavigate(e => {
-    const tvdbId = e.to.params.slug.split("-")[0]
-    fetchSeriesMetadata(tvdbId)
+    const tvdbId = e?.to?.params?.slug?.split("-")[0]
+    if (tvdbId && !isNaN(tvdbId)) {
+      fetchSeriesMetadata(tvdbId)
+    }
   })
 
   function fetchSearchResults() {
