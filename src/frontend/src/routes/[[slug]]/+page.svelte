@@ -146,6 +146,10 @@
     box-sizing: border-box;
     text-align: center;
     color: var(--DarkVibrantTextColor);
+
+    a {
+      color: var(--DarkVibrantTextColor);
+    }
   }
 </style>
 
@@ -332,6 +336,6 @@
     />
   {/if}
   <footer>
-    <small>Designed by Antriksh Yadav. Source <a href="https://github.com/Antrikshy/TotalRuntime" target="_blank">on GitHub</a>. Data from TheTVDB.</small>
+    <small>Designed by Antriksh Yadav. Source <a href="https://github.com/Antrikshy/TotalRuntime" target="_blank">on GitHub</a>. Data from <a href="https://thetvdb.com" target="_blank">TheTVDB</a>.</small>
   </footer>
 </main>

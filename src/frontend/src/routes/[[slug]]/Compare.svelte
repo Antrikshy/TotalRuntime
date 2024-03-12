@@ -2,6 +2,8 @@
   .compare-screen {
     height: 100vh;
     width: 100vw;
+    padding: 3rem;
+    box-sizing: border-box;
     position: fixed;
     top: 0;
     left: 0;
@@ -11,7 +13,7 @@
     ol {
       padding: 0;
       display: flex;
-      gap: 1rem;
+      gap: 2rem;
       flex-wrap: wrap;
       justify-content: center;
     }
