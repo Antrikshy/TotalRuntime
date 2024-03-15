@@ -53,9 +53,9 @@
       align-items: center;
       cursor: pointer;
 
-      &:hover {
-        background-color: var(--DarkVibrant);
-        color: var(--DarkVibrantTextColor);
+      &.hovered {
+        background-color: var(--DarkVibrant, #000);
+        color: var(--DarkVibrantTextColor, #fff);
       }
     }
   }
@@ -75,6 +75,7 @@
   export let freshStart = true
 
   let searchResults = []
+  let hoveredSearchResult = -1
 
   afterNavigate(e => {
     const tvdbId = e?.to?.params?.slug?.split("-")[0]
@@ -135,9 +136,14 @@
     autocorrect="off"
     autocapitalize="off"
     bind:value={searchQuery}
-    on:keypress={e => {
+    on:keydown={e => {
       if (e.key == "Escape") {
         searchQuery = ""
+        searchResults = []
+      } else if (e.key == "ArrowDown") {
+        hoveredSearchResult++
+      } else if (e.key == "ArrowUp") {
+        hoveredSearchResult--
       }
     }}
     on:input={debounce(fetchSearchResults, 500)}
@@ -145,8 +151,15 @@
 </form>
 {#if searchResults.length}
   <div class="search-results">
-    {#each searchResults as result}
-      <button class="search-result" on:click={_ => selectTitle(result)}>
+    {#each searchResults as result, i}
+      <button
+        class={"search-result" + (hoveredSearchResult == i ? " hovered" : "")}
+        on:click={_ => selectTitle(result)}
+        on:focusin={_ => hoveredSearchResult = i}
+        on:focusout={_ => hoveredSearchResult = -1}
+        on:pointerenter={_ => hoveredSearchResult = i}
+        on:pointerleave={_ => hoveredSearchResult = -1}
+      >
         {#if result.thumbnail}
           <img src={result.thumbnail} class="poster" alt="Poster for {result.title}"/>
         {/if}
