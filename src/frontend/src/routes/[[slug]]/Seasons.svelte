@@ -33,7 +33,6 @@
   import { humanizeRuntime } from "$lib/util.js"
 
   export let activeSeriesEpisodesBySeason
-
 </script>
 
 {#each Object.entries(activeSeriesEpisodesBySeason) as [seasonNum, season]}

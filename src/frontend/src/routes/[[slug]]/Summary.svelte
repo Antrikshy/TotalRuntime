@@ -52,5 +52,7 @@
     <strong>{seriesMetadata.title}</strong>
     {humanizeRuntime(seriesMetadata.totalRuntime)}
   </div>
-  <img src={seriesMetadata.thumbnail} class="poster" alt="Poster for {seriesMetadata.title} ({seriesMetadata.year})"/>
+  {#if seriesMetadata.thumbnail}
+    <img src={seriesMetadata.thumbnail} class="poster" alt="Poster for {seriesMetadata.title} ({seriesMetadata.year})"/>
+  {/if}
 </li>

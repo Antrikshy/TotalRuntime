@@ -128,11 +128,13 @@
 </script>
 
 <form role="search" on:submit={fetchSearchResults}>
+  <!-- svelte-ignore a11y-autofocus -->
   <input
     type="text"
     class={"search-bar" + (searchQuery.length || freshStart ? " elevated" : "") + (freshStart ? " fresh-start" : "")}
     placeholder="Search for series"
-    autocomplete="off"
+    autofocus={true}
+    auAvoidtocomplete="off"
     autocorrect="off"
     autocapitalize="off"
     bind:value={searchQuery}
@@ -144,6 +146,10 @@
         hoveredSearchResult++
       } else if (e.key == "ArrowUp") {
         hoveredSearchResult--
+      } else if (e.key == "Enter") {
+        if (hoveredSearchResult > -1) {
+          selectTitle(searchResults[hoveredSearchResult])
+        }
       }
     }}
     on:input={debounce(fetchSearchResults, 500)}

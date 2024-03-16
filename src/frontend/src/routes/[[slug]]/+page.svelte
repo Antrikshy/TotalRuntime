@@ -19,11 +19,15 @@
     font-style: normal;
   }
 
-  h1 {
+  h1.logo {
     text-align: center;
     margin-top: 0;
     cursor: default;
-    color: var(--DarkVibrantTextColor);
+
+    a {
+      color: var(--DarkVibrantTextColor);
+      text-decoration: none;
+    }
   }
 
   .top-area,
@@ -183,14 +187,15 @@
   let paletteDarkVibrantTextColor
 
   afterNavigate(e => {
+    if (e?.to?.url?.pathname == "/" && e?.from) {
+      showCompareScreen(false)
+      location.reload();
+    }
     const slug = e?.to?.params?.slug
     if (slug == "compare") {
       showCompareScreen(true)
     } else {
       showCompareScreen(false)
-    }
-    if (slug == "") {
-      activeSeries = null
     }
   })
 
@@ -217,9 +222,25 @@
   }
 
   function handleFoundSeriesEpisodes(e) {
+    // Function also updates selectedSeries by reference
     const episodes = e.detail
-    activeSeries.episodes = episodes  // Also updates selectedSeries by reference
+    activeSeries.numOfEpisodes = episodes.length
+    activeSeries.episodesBySeason = {}
+    if (!episodes.length) {
+      return;
+    }
     activeSeries.totalRuntime = episodes.reduce((total, ep) => total + ep.runtime, 0)
+    episodes.forEach(ep => {
+      const { season, episode } = ep
+      if (!activeSeries.episodesBySeason[season]) {
+        activeSeries.episodesBySeason[season] = {
+          totalRuntime: 0,
+          episodes: []
+        }
+      }
+      activeSeries.episodesBySeason[season]["episodes"][episode] = ep
+      activeSeries.episodesBySeason[season]["totalRuntime"] += ep.runtime
+    })
   }
 
   async function inferColorPalette() {
@@ -235,21 +256,8 @@
   }
 
   let activeSeriesHumanizedRuntime = ""
-  let activeSeriesEpisodesBySeason = {}
-  $: if (activeSeries?.episodes) {
+  $: if (activeSeries?.totalRuntime) {
     activeSeriesHumanizedRuntime = humanizeRuntime(activeSeries.totalRuntime)
-    activeSeriesEpisodesBySeason = {}
-    activeSeries.episodes.forEach(ep => {
-      const { season, episode } = ep
-      if (!activeSeriesEpisodesBySeason[season]) {
-        activeSeriesEpisodesBySeason[season] = {
-          totalRuntime: 0,
-          episodes: []
-        }
-      }
-      activeSeriesEpisodesBySeason[season]["episodes"][episode] = ep
-      activeSeriesEpisodesBySeason[season]["totalRuntime"] += ep.runtime
-    })
     if (activeSeries.thumbnail) {
       inferColorPalette()
     }
@@ -266,7 +274,7 @@
   --MutedTextColor: {paletteMutedTextColor};
   --DarkVibrantTextColor: {paletteDarkVibrantTextColor};
 ">
-  <h1>Total Runtime</h1>
+  <h1 class="logo"><a href="/">Total Runtime</a></h1>
   {#if !inCompareMode}
     <!-- TODO: Figure out staggered scaling -->
     <div role="presentation" transition:scale={{ start: 0.8, opacity: 0.8 }}>
@@ -311,8 +319,8 @@
         out:scale={{ start: 0.8, opacity: 0.5 }}
         in:scale={{ start: 0.8, opacity: 0.5 }}
       >
-        {#if (Object.keys(activeSeriesEpisodesBySeason).length)}
-          <Seasons activeSeriesEpisodesBySeason={activeSeriesEpisodesBySeason}/>
+        {#if (Object.keys(activeSeries?.episodesBySeason || {}).length)}
+          <Seasons activeSeriesEpisodesBySeason={activeSeries.episodesBySeason}/>
         {/if}
       </section>
     </div>
