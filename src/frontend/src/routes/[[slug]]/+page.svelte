@@ -32,10 +32,12 @@
 
   .top-area,
   .bottom-area {
-    margin-right: 2rem;
     border-radius: 1.5rem;
     background-color: var(--Muted);
     transition: 0.25s;
+    &.compare-available {
+      margin-right: 2rem;
+    }
     &:not(.fresh-start) {
       box-shadow:#00000080 0px 3px 15px;
     }
@@ -294,7 +296,7 @@
   {#if !inCompareMode}
     <!-- TODO: Figure out staggered scaling -->
     <div role="presentation" transition:scale={{ start: 0.8, opacity: 0.8 }}>
-      <section class="top-area {activeSeries == null ? " fresh-start" : ""}">
+      <section class="top-area {activeSeries == null ? " fresh-start" : ""} {Object.keys(selectedSeries).length > 1 ? " compare-available" : ""}">
         <section class="active-series-poster">
           {#if activeSeries?.thumbnail}
             <img src={activeSeries.thumbnail} class="poster" alt="Poster for {activeSeries.title} ({activeSeries.year})"/>
@@ -338,7 +340,7 @@
       </section>
       {#if (Object.keys(activeSeries?.episodesBySeason || {}).length)}
         <section
-          class="bottom-area {activeSeries == null ? " fresh-start" : ""}"
+          class="bottom-area {activeSeries == null ? " fresh-start" : ""} {Object.keys(selectedSeries).length > 1 ? " compare-available" : ""}"
           out:scale={{ start: 0.8, opacity: 0.5 }}
           in:scale={{ start: 0.8, opacity: 0.5 }}
         >
