@@ -2,7 +2,7 @@
   .compare-screen {
     height: 100vh;
     width: 100vw;
-    padding: 3rem;
+    padding: 5rem 3rem;
     box-sizing: border-box;
     position: fixed;
     top: 0;
@@ -21,11 +21,12 @@
     .close-button {
       all: initial;
       height: 2rem;
-      width: 2rem;
-      border-radius: 50%;
+      padding: 0 0.5rem;
+      border-radius: 1rem;
       position: absolute;
       top: 1.5rem;
       right: 1.5rem;
+      font-family: inherit;
       text-align: center;
       line-height: 2rem;
       cursor: pointer;
@@ -95,10 +96,10 @@
   in:fly={{ x: "100vw", duration: 500, delay: 100 }}
   out:fly={{ x: "100vw", duration: 500, delay: 100 }}
 >
-  <button class="close-button" on:click={_ => dispatch("closeCompareScreen")}>✖</button>
+  <button class="close-button" on:click={_ => dispatch("closeCompareScreen")}>Close ✖</button>
   <ol>
     {#each sortedSummaries as series, rank}
-      <Summary seriesMetadata={series} rank={rank + 1}/>
+      <Summary seriesMetadata={series} rank={rank + 1} on:unselectSeries/>
     {/each}
   </ol>
   <form class="sort-controls">

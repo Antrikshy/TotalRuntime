@@ -23,6 +23,20 @@
       background-color: #000;
     }
 
+    .close-button {
+      all: initial;
+      height: 2rem;
+      width: 2rem;
+      border-radius: 50%;
+      position: absolute;
+      top: -1rem;
+      right: -1rem;
+      text-align: center;
+      line-height: 2rem;
+      cursor: pointer;
+      background-color: #fff;
+    }
+
     .summary-text {
       padding: 0.5rem;
       display: flex;
@@ -40,7 +54,10 @@
 </style>
 
 <script>
+  import { createEventDispatcher } from "svelte"
   import { humanizeRuntime } from "$lib/util.js"
+
+  const dispatch = createEventDispatcher()
 
   export let seriesMetadata
   export let rank
@@ -48,6 +65,7 @@
 
 <li class="comparable-series-summary">
   <strong class="rank-indicator">{rank}</strong>
+  <button class="close-button" on:click={_ => dispatch("unselectSeries", seriesMetadata.tvdbId)}>✖</button>
   <div class="summary-text">
     <strong>{seriesMetadata.title}</strong>
     {humanizeRuntime(seriesMetadata.totalRuntime)}

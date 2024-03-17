@@ -134,12 +134,22 @@
     right: 0;
     border-top-left-radius: 1.5rem;
     border-bottom-left-radius: 1.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     writing-mode: vertical-lr;
     background-color: lightcoral;
-    cursor: pointer;
+    transition: 0.1s;
+    &:hover {
+      width: 3.5rem;
+    }
+
+    button {
+      all: unset;
+      height: 100%;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
   }
 
   footer {
@@ -255,11 +265,17 @@
     paletteDarkVibrantTextColor = textContrast.isLightOrDark(paletteDarkVibrant) === "dark" ? "#fff" : "#000"
   }
 
-  let activeSeriesHumanizedRuntime = ""
-  $: if (activeSeries?.totalRuntime) {
-    activeSeriesHumanizedRuntime = humanizeRuntime(activeSeries.totalRuntime)
-    if (activeSeries.thumbnail) {
-      inferColorPalette()
+  let activeSeriesHumanizedRuntime = null
+  $: {
+    if (activeSeries) {
+      if (activeSeries.totalRuntime) {
+        activeSeriesHumanizedRuntime = humanizeRuntime(activeSeries.totalRuntime)
+        if (activeSeries.thumbnail) {
+          inferColorPalette()
+        }
+      } else {
+        activeSeriesHumanizedRuntime = ""
+      }
     }
   }
 </script>
@@ -307,6 +323,12 @@
                 <br/>
                 <strong>{activeSeries.title}</strong>
               </big>
+            {:else if activeSeriesHumanizedRuntime == ""}
+              <big>
+                Runtime data unavailable for
+                <br/>
+                <strong>{activeSeries.title}</strong>
+              </big>
             {:else}
               <strong>Check and compare TV series runtimes, by season or in their entirety.</strong>
               <big>Search to begin.</big>
@@ -314,24 +336,22 @@
           </section>
         </summary>
       </section>
-      <section
-        class="bottom-area {activeSeries == null ? " fresh-start" : ""}"
-        out:scale={{ start: 0.8, opacity: 0.5 }}
-        in:scale={{ start: 0.8, opacity: 0.5 }}
-      >
-        {#if (Object.keys(activeSeries?.episodesBySeason || {}).length)}
+      {#if (Object.keys(activeSeries?.episodesBySeason || {}).length)}
+        <section
+          class="bottom-area {activeSeries == null ? " fresh-start" : ""}"
+          out:scale={{ start: 0.8, opacity: 0.5 }}
+          in:scale={{ start: 0.8, opacity: 0.5 }}
+        >
           <Seasons activeSeriesEpisodesBySeason={activeSeries.episodesBySeason}/>
-        {/if}
-      </section>
+        </section>
+      {/if}
     </div>
   {/if}
   {#if Object.keys(selectedSeries).length > 1 && !inCompareMode}
-    <nav
-      class="compare-screen-pull-tab"
-      on:click={_ => showCompareScreen(true)}
-      in:fly={{ x: "100vw", duration: 250 }}
-    >
-      Compare {Object.keys(selectedSeries).length} series
+    <nav class="compare-screen-pull-tab" in:fly={{ x: "100vw", duration: 250 }}>
+      <button on:click={_ => showCompareScreen(true)}>
+        Compare {Object.keys(selectedSeries).length} series
+      </button>
     </nav>
   {/if}
   {#if inCompareMode}
@@ -340,6 +360,11 @@
       on:closeCompareScreen={_ => {
         history.back()
         showCompareScreen(false)
+      }}
+      on:unselectSeries={e => {
+        selectedSeries = Object.fromEntries(
+          Object.entries(selectedSeries).filter(([k]) => k != e.detail)
+        )
       }}
     />
   {/if}

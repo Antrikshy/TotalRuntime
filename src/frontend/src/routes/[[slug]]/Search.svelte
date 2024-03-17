@@ -75,7 +75,7 @@
   export let freshStart = true
 
   let searchResults = []
-  let hoveredSearchResult = -1
+  let hoveredSearchResult = 0
 
   afterNavigate(e => {
     const tvdbId = e?.to?.params?.slug?.split("-")[0]
