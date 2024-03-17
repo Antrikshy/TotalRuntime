@@ -2,7 +2,7 @@
   .compare-screen {
     height: 100vh;
     width: 100vw;
-    padding: 5rem 3rem;
+    padding: 5rem 3rem 15rem;
     box-sizing: border-box;
     position: fixed;
     top: 0;
@@ -18,19 +18,22 @@
       justify-content: center;
     }
 
-    .close-button {
-      all: initial;
-      height: 2rem;
-      padding: 0 0.5rem;
-      border-radius: 1rem;
+    .top-right-buttons {
       position: absolute;
       top: 1.5rem;
       right: 1.5rem;
-      font-family: inherit;
-      text-align: center;
-      line-height: 2rem;
-      cursor: pointer;
-      background-color: #fff;
+
+      button {
+        all: initial;
+        height: 2rem;
+        padding: 0 0.5rem;
+        border-radius: 1rem;
+        font-family: inherit;
+        text-align: center;
+        line-height: 2rem;
+        cursor: pointer;
+        background-color: #fff;
+      }
     }
 
     .sort-controls {
@@ -43,6 +46,7 @@
       left: 50%;
       transform: translateX(-50%);
       border-radius: 1rem;
+      box-shadow:#00000080 0px 3px 15px;
       background-color: #fff;
 
       select {
@@ -96,10 +100,16 @@
   in:fly={{ x: "100vw", duration: 500, delay: 100 }}
   out:fly={{ x: "100vw", duration: 500, delay: 100 }}
 >
-  <button class="close-button" on:click={_ => dispatch("closeCompareScreen")}>Close ✖</button>
+  <div class="top-right-buttons">
+    <button on:click={_ => {
+      Object.values(selectedSeries).forEach(series => dispatch("deselectSeries", series.tvdbId))
+      dispatch("closeCompareScreen")
+    }}>Clear All</button>
+    <button on:click={_ => dispatch("closeCompareScreen")}>Close ✖</button>
+  </div>
   <ol>
     {#each sortedSummaries as series, rank}
-      <Summary seriesMetadata={series} rank={rank + 1} on:unselectSeries/>
+      <Summary seriesMetadata={series} rank={rank + 1} on:deselectSeries/>
     {/each}
   </ol>
   <form class="sort-controls">

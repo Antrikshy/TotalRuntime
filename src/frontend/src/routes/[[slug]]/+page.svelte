@@ -361,7 +361,7 @@
         history.back()
         showCompareScreen(false)
       }}
-      on:unselectSeries={e => {
+      on:deselectSeries={e => {
         selectedSeries = Object.fromEntries(
           Object.entries(selectedSeries).filter(([k]) => k != e.detail)
         )

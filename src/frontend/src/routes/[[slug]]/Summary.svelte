@@ -8,6 +8,7 @@
     gap: 0.5rem;
     list-style: none;
     border-radius: 1rem;
+    box-shadow:#00000080 0px 3px 15px;
     background-color: #fff;
 
     .rank-indicator {
@@ -65,7 +66,7 @@
 
 <li class="comparable-series-summary">
   <strong class="rank-indicator">{rank}</strong>
-  <button class="close-button" on:click={_ => dispatch("unselectSeries", seriesMetadata.tvdbId)}>✖</button>
+  <button class="close-button" on:click={_ => dispatch("deselectSeries", seriesMetadata.tvdbId)}>✖</button>
   <div class="summary-text">
     <strong>{seriesMetadata.title}</strong>
     {humanizeRuntime(seriesMetadata.totalRuntime)}
