@@ -1,5 +1,6 @@
 import Fastify from "fastify"
 import axios from "axios"
+import median from "just-median"
 
 const fastify = Fastify({
   logger: true
@@ -108,11 +109,7 @@ fastify.get("/episodes", (request, reply) => {
         // Second pass - imputation
         if (!episode["runtime"]) {
           const runtimeForThisSeason = runtimesBySeason[episode["season"]].filter(Boolean)  // TODO: What if all empty?
-          // Memoization
-          averageBySeason[episode["season"]] ??= Math.round(
-            runtimeForThisSeason
-              .reduce((a, b) => a + b) / runtimeForThisSeason.length
-          )
+          averageBySeason[episode["season"]] ??= Math.round(median(runtimeForThisSeason))  // Memoization
           episode["runtime"] = averageBySeason[episode["season"]]
           episode["runtimeQuality"] = "computedAverage"
         }
