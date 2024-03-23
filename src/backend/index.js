@@ -82,18 +82,61 @@ fastify.get("/episodes", (request, reply) => {
   reply.header("Access-Control-Allow-Methods", "GET")
   const tvdbId = request.query.id
   if (!tvdbId || isNaN(tvdbId)) { reply.code(404).send() }
+  function _imputeRuntimes(compactEpisodes, averageRuntime) {
+    /* Smart fill for missing runtimes, only run if any runtimes are missing */
+    if (averageRuntime) {
+      // If TheTVDB has an average runtime for this series, keep things simple
+      compactEpisodes.forEach(episode => {
+        if (!episode["runtime"]) {
+          episode["runtime"] = averageRuntime
+          episode["runtimeQuality"] = "fetchedAverage"
+        }
+      })
+    } else {
+      // If TheTVDB does not have average runtime for this series, use season runtime averages
+      const runtimesBySeason = []
+      const averageBySeason = []  // For memoization
+      compactEpisodes.forEach(episode => {
+        // First pass - collecting runtimes in array of arrays
+        if (!runtimesBySeason[episode["season"]]) {
+          runtimesBySeason[episode["season"]] = []
+        }
+        runtimesBySeason[episode["season"]][episode["episode"]] = episode["runtime"]
+      })
+      compactEpisodes.forEach(episode => {
+        // TODO: Future releases?
+        // Second pass - imputation
+        if (!episode["runtime"]) {
+          const runtimeForThisSeason = runtimesBySeason[episode["season"]].filter(Boolean)  // TODO: What if all empty?
+          // Memoization
+          averageBySeason[episode["season"]] ??= Math.round(
+            runtimeForThisSeason
+              .reduce((a, b) => a + b) / runtimeForThisSeason.length
+          )
+          episode["runtime"] = averageBySeason[episode["season"]]
+          episode["runtimeQuality"] = "computedAverage"
+        }
+      })
+    }
+  }
   tvdb.get(`/series/${tvdbId}/episodes/official`, { params: { page: 0 } }).then(res => {
+    // res.data["data"]["series"]["averageRuntime"] = undefined  // TODO: For manual testing; remove
     const compactEpisodes = res.data["data"]?.["episodes"]
+      // .map(episode => episode["number"] % 5 == 0 ? {...episode, runtime: undefined} : episode)  // TODO: For manual testing; remove
       .filter(episode =>
         // Skipping season 0 (often bonus content)
-        episode["seasonNumber"] && episode["seasonNumber"] != 0 &&
-        episode["runtime"]
+        episode["seasonNumber"] && episode["seasonNumber"] != 0
       )
       .map(episode => ({
         "season": episode["seasonNumber"],
         "episode": episode["number"],
-        "runtime": episode["runtime"]
+        "runtime": episode["runtime"],
+        "runtimeQuality": episode["runtime"] ? "fetchedRaw" : ""  // Blanks will be populated during imputation
       }))
+    if (compactEpisodes.some(episode => !episode["runtime"])) {
+      // If any of the episodes is missing runtime
+      _imputeRuntimes(compactEpisodes, res.data["data"]?.["series"]?.["averageRuntime"])
+    }
     if (compactEpisodes.length) {
       reply.send(compactEpisodes)
     } else {

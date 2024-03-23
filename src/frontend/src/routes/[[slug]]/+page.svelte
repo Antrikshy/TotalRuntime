@@ -18,6 +18,10 @@
     font-optical-sizing: auto;
     font-weight: 400;
     font-style: normal;
+
+    :global(.help-text) {
+      cursor: help;
+    }
   }
 
   h1.logo {
@@ -252,16 +256,22 @@
       return;
     }
     activeSeries.totalRuntime = episodes.reduce((total, ep) => total + ep.runtime, 0)
+    activeSeries.runtimeWasImputed = false
     episodes.forEach(ep => {
       const { season, episode } = ep
       if (!activeSeries.episodesBySeason[season]) {
         activeSeries.episodesBySeason[season] = {
           totalRuntime: 0,
+          runtimeWasImputed: false,
           episodes: []
         }
       }
       activeSeries.episodesBySeason[season]["episodes"][episode] = ep
       activeSeries.episodesBySeason[season]["totalRuntime"] += ep.runtime
+      if (ep.runtimeQuality != "fetchedRaw") {
+        activeSeries.runtimeWasImputed = true
+        activeSeries.episodesBySeason[season]["runtimeWasImputed"] = true
+      }
     })
   }
 
@@ -329,7 +339,9 @@
               <big>
                 It will take you
                 <br/>
-                <strong>{activeSeriesHumanizedRuntime}</strong>
+                <strong>{activeSeriesHumanizedRuntime}</strong>{#if activeSeries.runtimeWasImputed}
+                  <span class="help-text" title="This series' runtime had gaps that were filled in with approximation.">*</span>
+                {/if}
                 <br/>
                 to watch
                 <br/>
@@ -381,6 +393,6 @@
     />
   {/if}
   <footer>
-    <small>Designed by Antriksh Yadav. Source <a href="https://github.com/Antrikshy/TotalRuntime" target="_blank">on GitHub</a>. Data from <a href="https://thetvdb.com" target="_blank">TheTVDB</a>.</small>
+    <small>Designed by <a href="https://antrikshy.com">Antriksh Yadav</a>. Source <a href="https://github.com/Antrikshy/TotalRuntime" target="_blank">on GitHub</a>. Data from <a href="https://thetvdb.com" target="_blank">TheTVDB</a>.</small>
   </footer>
 </main>
