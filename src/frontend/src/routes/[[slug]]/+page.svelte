@@ -1,4 +1,5 @@
 <style lang="scss">
+  @import '../../../static/responsive.scss';
   @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Gilda+Display&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Literata:ital,opsz,wght@0,7..72,200..900;1,7..72,200..900&family=Pathway+Extreme:ital,opsz,wght@0,8..144,100..900;1,8..144,100..900&display=swap');
 
   main {
@@ -110,6 +111,15 @@
 
         big {
           font-size: 3.5rem;
+
+          @include override-for(md-screen) {
+            font-size: 2.5rem;
+            line-height: 2.5rem;
+          }
+          @include override-for(sm-screen) {
+            font-size: 1.5rem;
+            line-height: 1.5rem;
+          }
 
           strong {
             font-family: "Libre Baskerville", serif;
