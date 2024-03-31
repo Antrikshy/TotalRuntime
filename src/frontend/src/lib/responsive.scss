@@ -1,0 +1,19 @@
+$all-breakpoints: (
+  'sm-screen': '36rem',
+  'md-screen': '48rem',
+  'lg-screen': '80rem',
+  'xl-screen': '100rem'
+);
+
+@mixin override-for-smaller-than($requested-breakpoint) {
+  @media only screen and (max-width: map-get($all-breakpoints, $requested-breakpoint)) {
+    @content;
+  }
+}
+
+@mixin override-for-larger-than($requested-breakpoint) {
+  // Adding 1px eliminates disputed territory at breakpoints
+  @media only screen and (min-width: calc(#{map-get($all-breakpoints, $requested-breakpoint)} + 1px)) {
+    @content;
+  }
+}

@@ -146,7 +146,7 @@ fastify.get("/episodes", (request, reply) => {
   })
 })
 
-fastify.listen({ port: 3000 }, (err) => {
+fastify.listen({ host: "::", port: 3000 }, (err) => {
   if (err) {
     fastify.log.error(err)
     process.exit(1)

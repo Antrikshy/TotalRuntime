@@ -1,4 +1,6 @@
 <style lang="scss">
+  @import '../../lib/responsive.scss';
+
   .search-bar {
     height: 4rem;
     width: 100%;
@@ -11,9 +13,20 @@
     // TODO
     font-family: "Pathway Extreme", sans-serif;
     transition: 0.15s;
+    @include override-for-smaller-than(md-screen) {
+      height: 3rem;
+      font-size: 1.5rem;
+    }
+    @include override-for-smaller-than(sm-screen) {
+      height: 2.5rem;
+      font-size: 1rem;
+    }
     &:not(.elevated):not(.fresh-start) {
       border-radius: unset;
       border-top-right-radius: 1rem;
+      @include override-for-smaller-than(md-screen) {
+        border-top-left-radius: 1rem;
+      }
     }
     &:focus,
     &.fresh-start {
@@ -32,10 +45,16 @@
     border-radius: 1rem;
     background-color: #fff;
     box-shadow: #3b3b3b80 0px 3px 10px;
+    @include override-for-smaller-than(md-screen) {
+      font-size: smaller;
+    }
 
     .search-result {
       .poster {
         height: 4rem;
+        @include override-for-smaller-than(sm-screen) {
+          height: 3rem;
+        }
       }
 
       // Is a <button> for accessibility, resetting styles
@@ -52,7 +71,10 @@
       gap: 1rem;
       align-items: center;
       cursor: pointer;
-
+      @include override-for-smaller-than(sm-screen) {
+        min-height: 3rem;
+        padding: 0.15rem 1rem;
+      }
       &.hovered {
         background-color: var(--DarkVibrant, #000);
         color: var(--DarkVibrantTextColor, #fff);
@@ -119,6 +141,7 @@
   }
 
   function selectTitle(result) {
+    hoveredSearchResult = 0
     dispatch("resultSeries", result)
     searchQuery = ""
     searchResults = []
@@ -127,13 +150,13 @@
   }
 </script>
 
-<form role="search" on:submit={fetchSearchResults}>
+<form role="search" on:submit={e => {e.preventDefault(); fetchSearchResults();}}>
   <!-- svelte-ignore a11y-autofocus -->
   <input
     type="text"
     class={"search-bar" + (searchQuery.length || freshStart ? " elevated" : "") + (freshStart ? " fresh-start" : "")}
     placeholder="Search for series"
-    autofocus={true}
+    autofocus={freshStart}
     auAvoidtocomplete="off"
     autocorrect="off"
     autocapitalize="off"
@@ -147,7 +170,7 @@
       } else if (e.key == "ArrowUp") {
         hoveredSearchResult--
       } else if (e.key == "Enter") {
-        if (hoveredSearchResult > -1) {
+        if (searchResults.length) {
           selectTitle(searchResults[hoveredSearchResult])
         }
       }

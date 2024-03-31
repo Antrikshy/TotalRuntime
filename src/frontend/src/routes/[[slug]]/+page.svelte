@@ -1,10 +1,12 @@
 <style lang="scss">
-  @import '../../../static/responsive.scss';
+  @import '../../lib/responsive.scss';
   @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Gilda+Display&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Literata:ital,opsz,wght@0,7..72,200..900;1,7..72,200..900&family=Pathway+Extreme:ital,opsz,wght@0,8..144,100..900;1,8..144,100..900&display=swap');
 
   main {
-    // TODO
-    // ::selection
+    :global(::selection) {
+      background-color: var(--LightVibrant);
+      color: var(--paletteLightVibrantTextColor);
+    }
 
     min-height: 100vh;
     padding: 1rem 3rem;
@@ -18,6 +20,9 @@
     font-optical-sizing: auto;
     font-weight: 400;
     font-style: normal;
+    @include override-for-smaller-than(md-screen) {
+      padding: 1rem 1.5rem;
+    }
 
     :global(.help-text) {
       cursor: help;
@@ -37,6 +42,9 @@
 
   .top-area,
   .bottom-area {
+    max-width: 100rem;
+    margin: auto;
+    box-sizing: border-box;
     border-radius: 1.5rem;
     background-color: var(--Muted);
     transition: 0.25s;
@@ -50,11 +58,18 @@
 
   .top-area {
     display: flex;
+    @include override-for-smaller-than(md-screen) {
+      flex-direction: column;
+    }
 
     .active-series-poster {
       height: 30rem;
       max-width: 21rem;
+      text-align: center;
       z-index: 0;
+      @include override-for-smaller-than(md-screen) {
+        display: none;
+      }
 
       .poster {
         height: 100%;
@@ -103,26 +118,45 @@
         align-items: center;
         justify-content: center;
         border-bottom-right-radius: 1.5rem;
-        background: linear-gradient(to right, transparent, 10%, var(--Muted) 25%);
+        overflow: hidden;
+        background-size: auto 100%;
+        background-repeat: no-repeat;
+        background-position: center center;
         color: var(--MutedTextColor);
+        @include override-for-smaller-than(md-screen) {
+          height: 18rem;
+          padding: 0.5rem;
+          border-bottom-left-radius: 1.5rem;
+          justify-content: end;
+        }
+        @include override-for-larger-than(md-screen) {
+          background: linear-gradient(to right, transparent, var(--Muted) 25%) !important;
+        }
 
         // TODO
         font-family: "Gilda Display", serif;
         font-optical-sizing: auto;
         // font-weight: 600;
         font-style: normal;
-        line-height: 3.5rem;
 
         big {
-          font-size: 3.5rem;
-
-          @include override-for(md-screen) {
-            font-size: 2.5rem;
-            line-height: 2.5rem;
+          font-size: 3rem;
+          line-height: 3.5rem;
+          @include override-for-smaller-than(md-screen) {
+            font-size: 2rem;
+            line-height: 2.3rem;
+            &>* {
+              background-color: var(--Muted);
+              padding: 0 0.25rem;
+            }
           }
-          @include override-for(sm-screen) {
+          @include override-for-smaller-than(sm-screen) {
             font-size: 1.5rem;
-            line-height: 1.5rem;
+            line-height: 2rem;
+          }
+          @include override-for-larger-than(xl-screen) {
+            font-size: 4.5rem;
+            line-height: 4.5rem;
           }
 
           strong {
@@ -137,8 +171,11 @@
 
   .bottom-area {
     margin-top: 1.5rem;
-    margin-bottom: 2.5rem;
+    margin-bottom: 5rem;  // Roughly making room for footer
     padding: 2rem;
+    @include override-for-smaller-than(md-screen) {
+      padding: 1rem;
+    }
   }
 
   .compare-screen-pull-tab {
@@ -151,10 +188,14 @@
     border-top-left-radius: 1.5rem;
     border-bottom-left-radius: 1.5rem;
     writing-mode: vertical-lr;
-    background-color: lightcoral;
+    background-color: var(--Muted);
+    color: var(--MutedTextColor);
     transition: 0.1s;
     &:hover {
       width: 3.5rem;
+    }
+    @include override-for-smaller-than(md-screen) {
+      // TODO
     }
 
     button {
@@ -169,13 +210,17 @@
   }
 
   footer {
-    width: calc(100vw - 6rem);
+    width: 100%;
     margin: 1rem 0;
     position: absolute;
+    left: 0;
+    right: 0;
     bottom: 0;
-    box-sizing: border-box;
     text-align: center;
     color: var(--DarkVibrantTextColor);
+    @include override-for-smaller-than(sm-screen) {
+      font-size: small;
+    }
 
     a {
       color: var(--DarkVibrantTextColor);
@@ -211,6 +256,7 @@
   let paletteVibrant
   let paletteMutedTextColor
   let paletteDarkVibrantTextColor
+  let paletteLightVibrantTextColor
 
   afterNavigate(e => {
     if (e?.to?.url?.pathname == "/" && e?.from) {
@@ -285,6 +331,8 @@
     paletteVibrant = palette["Vibrant"]?.hex
     paletteMutedTextColor = textContrast.isLightOrDark(paletteMuted) === "dark" ? "#fff" : "#000"
     paletteDarkVibrantTextColor = textContrast.isLightOrDark(paletteDarkVibrant) === "dark" ? "#fff" : "#000"
+    paletteLightVibrantTextColor = textContrast.isLightOrDark(paletteLightVibrant) === "dark" ? "#fff" : "#000"
+    document.getElementsByTagName("meta")["theme-color"].content = paletteDarkVibrant;  // Syncing browser theme
   }
 
   let activeSeriesHumanizedRuntime = null
@@ -311,6 +359,7 @@
   --Vibrant: {paletteVibrant};
   --MutedTextColor: {paletteMutedTextColor};
   --DarkVibrantTextColor: {paletteDarkVibrantTextColor};
+  --LightVibrantTextColor: {paletteLightVibrantTextColor};
 ">
   <h1 class="logo"><a href="/">Total Runtime</a></h1>
   {#if !inCompareMode}
@@ -334,18 +383,22 @@
               on:resultEpisodes={handleFoundSeriesEpisodes}
             />
           </aside>
-          <section class="active-series-runtime">
+          <!-- CSS inline because URLs don't translate from Svelte to CSS variables well -->
+          <section class="active-series-runtime" style="
+            background-image: linear-gradient(to bottom, transparent 0, var(--Muted) 95%), url({activeSeries?.thumbnail});
+            <!-- background-color: var(--DarkVibrant); -->
+          ">
             {#if activeSeriesHumanizedRuntime}
               <big>
-                It will take you
+                <span>It will take you</span>
                 <br/>
                 <strong>{activeSeriesHumanizedRuntime}</strong>{#if activeSeries.runtimeWasImputed}
                   <span class="help-text" title="This series' runtime had gaps that were filled in with approximation.">*</span>
                 {/if}
                 <br/>
-                to watch
+                <span>to watch</span>
                 <br/>
-                <strong>{activeSeries.title}</strong>
+                <span><strong>{activeSeries.title}</strong> <small>({activeSeries.year})</small></span>
               </big>
             {:else if activeSeriesHumanizedRuntime == ""}
               <big>

@@ -1,16 +1,38 @@
 <style lang="scss">
+  @import '../../lib/responsive.scss';
+
   .season {
     min-height: 5rem;
-    margin: 1rem 0;
+    margin: 0.5rem 0;
     display: grid;
     grid-template-columns: 1fr 3fr;
     color: var(--MutedTextColor);
+    @include override-for-smaller-than(md-screen) {
+      gap: 1rem;
+      grid-template-columns: auto;
+      grid-template-rows: auto auto;
+      &:not(:last-child) {
+        padding-bottom: 1rem;
+        border-bottom: 2px solid var(--MutedTextColor);
+      }
+    }
 
     .season-summary {
       font-size: 1.5rem;
       display: flex;
       flex-direction: column;
       justify-content: center;
+      @include override-for-smaller-than(md-screen) {
+        text-align: center;
+        font-size: 1rem;
+      }
+      @include override-for-smaller-than(sm-screen) {
+        line-height: 1.2rem;
+      }
+
+      big {
+        font-weight: bold;
+      }
     }
 
     .episode-list {
@@ -21,9 +43,16 @@
       overflow-x: scroll;
       align-items: center;
       mask-image: linear-gradient(90deg, #000 90%, transparent 100%);
+      @include override-for-smaller-than(md-screen) {
+        gap: 0.5rem;
+        font-size: 0.8rem;
+      }
 
       .episode {
         min-width: 8rem;
+        @include override-for-smaller-than(md-screen) {
+          min-width: 5.5rem;
+        }
 
         .low-quality-runtime {
           text-decoration: underline;

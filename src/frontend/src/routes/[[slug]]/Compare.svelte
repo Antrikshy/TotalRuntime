@@ -1,4 +1,6 @@
 <style lang="scss">
+  @import '../../lib/responsive.scss';
+
   .compare-screen {
     height: 100vh;
     width: 100vw;
@@ -8,7 +10,11 @@
     top: 0;
     left: 0;
     overflow-y: scroll;
-    background-color: lightcoral;
+    background-color: #fff;
+    @include override-for-smaller-than(md-screen) {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
 
     ol {
       padding: 0;
@@ -32,6 +38,7 @@
         text-align: center;
         line-height: 2rem;
         cursor: pointer;
+        box-shadow:#00000080 0px 3px 6px;
         background-color: #fff;
       }
     }
@@ -48,6 +55,9 @@
       border-radius: 1rem;
       box-shadow:#00000080 0px 3px 15px;
       background-color: #fff;
+      @include override-for-smaller-than(md-screen) {
+        bottom: 2rem;
+      }
 
       select {
         font-size: 1.5rem;

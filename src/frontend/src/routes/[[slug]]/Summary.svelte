@@ -20,6 +20,7 @@
       font-size: xx-large;
       text-align: center;
       border-radius: 0.5rem;
+      box-shadow:#00000080 0px 3px 10px;
       color: #fff;
       background-color: #000;
     }
@@ -35,6 +36,7 @@
       text-align: center;
       line-height: 2rem;
       cursor: pointer;
+      box-shadow:#00000080 0px 3px 10px;
       background-color: #fff;
     }
 
