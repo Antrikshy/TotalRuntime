@@ -60,7 +60,6 @@
       // Is a <button> for accessibility, resetting styles
       all: initial;
       font: inherit;
-      color: inherit;
 
       min-height: 5rem;
       width: 100%;
@@ -71,12 +70,13 @@
       gap: 1rem;
       align-items: center;
       cursor: pointer;
+      color: var(--DarkColor);
       @include override-for-smaller-than(sm-screen) {
         min-height: 3rem;
         padding: 0.15rem 1rem;
       }
       &.hovered {
-        background-color: var(--DarkVibrant, #000);
+        background-color: var(--DarkVibrant, var(--DarkColor));
         color: var(--DarkVibrantTextColor, #fff);
       }
     }

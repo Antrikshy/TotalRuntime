@@ -4,13 +4,14 @@
   .compare-screen {
     height: 100vh;
     width: 100vw;
-    padding: 5rem 3rem 15rem;
+    padding: 5rem 3rem 13rem;
     box-sizing: border-box;
     position: fixed;
     top: 0;
     left: 0;
     overflow-y: scroll;
     background-color: #fff;
+    color: var(--DarkColor);
     @include override-for-smaller-than(md-screen) {
       padding-left: 1.5rem;
       padding-right: 1.5rem;
@@ -48,19 +49,22 @@
       display: flex;
       flex-wrap: wrap;
       gap: 1rem;
+      align-items: stretch;
       position: fixed;
-      bottom: 5rem;
+      bottom: 4rem;
       left: 50%;
       transform: translateX(-50%);
       border-radius: 1rem;
-      box-shadow:#00000080 0px 3px 15px;
+      box-shadow:#00000080 0px 3px 10px;
       background-color: #fff;
       @include override-for-smaller-than(md-screen) {
-        bottom: 2rem;
+        gap: 0.5rem;
+        bottom: 3rem;
       }
-
-      select {
-        font-size: 1.5rem;
+      @include override-for-larger-than(md-screen) {
+        select {
+          font-size: 1.5rem;
+        }
       }
     }
   }

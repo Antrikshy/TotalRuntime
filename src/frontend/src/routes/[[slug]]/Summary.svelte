@@ -1,4 +1,6 @@
 <style lang="scss">
+  @import '../../lib/responsive.scss';
+
   .comparable-series-summary {
     height: 8rem;
     width: 30rem;
@@ -10,6 +12,10 @@
     border-radius: 1rem;
     box-shadow:#00000080 0px 3px 15px;
     background-color: #fff;
+    @include override-for-smaller-than(md-screen) {
+      font-size: smaller;
+      height: 6rem;
+    }
 
     .rank-indicator {
       min-width: 1.5rem;
@@ -22,7 +28,13 @@
       border-radius: 0.5rem;
       box-shadow:#00000080 0px 3px 10px;
       color: #fff;
-      background-color: #000;
+      background-color: var(--DarkColor);
+      @include override-for-smaller-than(md-screen) {
+        padding: 0.25rem;
+        top: -1.25rem;
+        left: -0.75rem;
+        font-size: x-large;
+      }
     }
 
     .close-button {
@@ -38,6 +50,13 @@
       cursor: pointer;
       box-shadow:#00000080 0px 3px 10px;
       background-color: #fff;
+      @include override-for-smaller-than(md-screen) {
+        height: 1.5rem;
+        width: 1.5rem;
+        line-height: 1.5rem;
+        top: -0.75rem;
+        right: -0.75rem;
+      }
     }
 
     .summary-text {

@@ -5,11 +5,12 @@
     min-height: 5rem;
     margin: 0.5rem 0;
     display: grid;
-    grid-template-columns: 1fr 3fr;
+    grid-template-columns: 17rem auto;
+    gap: 1rem;
     color: var(--MutedTextColor);
     @include override-for-smaller-than(md-screen) {
       gap: 1rem;
-      grid-template-columns: auto;
+      grid-template-columns: unset;
       grid-template-rows: auto auto;
       &:not(:last-child) {
         padding-bottom: 1rem;
@@ -75,7 +76,7 @@
       <div><big>Season {seasonNum}</big></div>
       <div><small>
         {humanizeRuntime(season.totalRuntime)}{#if season.runtimeWasImputed}
-          <span class="help-text" title="This season's runtime had gaps that were filled in with approximation.">*</span>
+          <span class="help-text" tabindex="-1" title="This season's runtime had gaps that were filled in with approximation.">*</span>
         {/if}
       </small></div>
       <div><small>{season.episodes.length} episodes</small></div>
@@ -88,9 +89,9 @@
           {#if episode.runtime}
             <span class={episode.runtimeQuality != "fetchedRaw" ? "low-quality-runtime" : ""}>
               {episode.runtime} minutes{#if episode.runtimeQuality == "fetchedAverage"}
-                <sup class="help-text" title="Inferred from official series average runtime, as episode runtime was unavailable.">1</sup>
+                <sup class="help-text" tabindex="-1" title="Inferred from official series average runtime, as episode runtime was unavailable.">1</sup>
               {:else if episode.runtimeQuality == "computedAverage"}
-                <sup class="help-text" title="Computed median runtime for season, as episode runtime and official series average were unavailable.">2</sup>
+                <sup class="help-text" tabindex="-1" title="Computed median runtime for season, as episode runtime and official series average were unavailable.">2</sup>
               {/if}
             </span>
           {:else}

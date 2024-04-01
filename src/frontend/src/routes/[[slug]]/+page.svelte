@@ -3,16 +3,17 @@
   @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Gilda+Display&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Literata:ital,opsz,wght@0,7..72,200..900;1,7..72,200..900&family=Pathway+Extreme:ital,opsz,wght@0,8..144,100..900;1,8..144,100..900&display=swap');
 
   main {
-    :global(::selection) {
+    ::selection {
       background-color: var(--LightVibrant);
-      color: var(--paletteLightVibrantTextColor);
+      color: var(--LightVibrantTextColor);
     }
 
     min-height: 100vh;
     padding: 1rem 3rem;
     box-sizing: border-box;
     position: relative;
-    background-color: var(--DarkVibrant);
+    background-color: var(--DarkVibrant, #fff);
+    color: var(--DarkVibrantTextColor, var(--DarkColor));
     transition: 0.25s;
 
     // TODO
@@ -20,12 +21,13 @@
     font-optical-sizing: auto;
     font-weight: 400;
     font-style: normal;
+    &.compare-available {
+      @include override-for-larger-than(md-screen) {
+        padding-right: 4.5rem;
+      }
+    }
     @include override-for-smaller-than(md-screen) {
       padding: 1rem 1.5rem;
-    }
-
-    :global(.help-text) {
-      cursor: help;
     }
   }
 
@@ -35,7 +37,6 @@
     cursor: default;
 
     a {
-      color: var(--DarkVibrantTextColor);
       text-decoration: none;
     }
   }
@@ -48,11 +49,8 @@
     border-radius: 1.5rem;
     background-color: var(--Muted);
     transition: 0.25s;
-    &.compare-available {
-      margin-right: 2rem;
-    }
     &:not(.fresh-start) {
-      box-shadow:#00000080 0px 3px 15px;
+      box-shadow: #00000080 0px 3px 15px;
     }
   }
 
@@ -171,7 +169,7 @@
 
   .bottom-area {
     margin-top: 1.5rem;
-    margin-bottom: 5rem;  // Roughly making room for footer
+    margin-bottom: 5rem;  // Crudely making room for footer
     padding: 2rem;
     @include override-for-smaller-than(md-screen) {
       padding: 1rem;
@@ -188,14 +186,30 @@
     border-top-left-radius: 1.5rem;
     border-bottom-left-radius: 1.5rem;
     writing-mode: vertical-lr;
-    background-color: var(--Muted);
-    color: var(--MutedTextColor);
+    box-shadow: #00000080 0px 0px 15px;
+    background-color: var(--LightVibrant);
+    color: var(--LightVibrantTextColor);
     transition: 0.1s;
-    &:hover {
-      width: 3.5rem;
+    @include override-for-larger-than(md-screen) {
+      &:hover {
+        width: 3.5rem;
+      }
     }
     @include override-for-smaller-than(md-screen) {
-      // TODO
+      height: 2rem;
+      min-height: unset;
+      width: 50vw;
+      border-radius: 0;
+      border-top-left-radius: 1.5rem;
+      border-top-right-radius: 1.5rem;
+      writing-mode: unset;
+      top: unset;
+      left: 25vw;
+      right: unset;
+      bottom: 0;
+      &:hover {
+        height: 2.5rem;
+      }
     }
 
     button {
@@ -211,19 +225,24 @@
 
   footer {
     width: 100%;
-    margin: 1rem 0;
+    margin-bottom: 1rem;
     position: absolute;
     left: 0;
     right: 0;
     bottom: 0;
     text-align: center;
-    color: var(--DarkVibrantTextColor);
+    transition: 0.25s;
     @include override-for-smaller-than(sm-screen) {
       font-size: small;
+      &.compare-available {
+        margin-bottom: 3rem;
+      }
     }
-
-    a {
-      color: var(--DarkVibrantTextColor);
+    &.compare-active {
+      * {
+        background-color: #fff;
+        color: var(--DarkColor);
+      }
     }
   }
 </style>
@@ -329,9 +348,9 @@
     paletteLightVibrant = palette["LightVibrant"]?.hex
     paletteMuted = palette["Muted"]?.hex
     paletteVibrant = palette["Vibrant"]?.hex
-    paletteMutedTextColor = textContrast.isLightOrDark(paletteMuted) === "dark" ? "#fff" : "#000"
-    paletteDarkVibrantTextColor = textContrast.isLightOrDark(paletteDarkVibrant) === "dark" ? "#fff" : "#000"
-    paletteLightVibrantTextColor = textContrast.isLightOrDark(paletteLightVibrant) === "dark" ? "#fff" : "#000"
+    paletteMutedTextColor = textContrast.isLightOrDark(paletteMuted) === "dark" ? "#fff" : "var(--DarkColor)"
+    paletteDarkVibrantTextColor = textContrast.isLightOrDark(paletteDarkVibrant) === "dark" ? "#fff" : "var(--DarkColor)"
+    paletteLightVibrantTextColor = textContrast.isLightOrDark(paletteLightVibrant) === "dark" ? "#fff" : "var(--DarkColor)"
     document.getElementsByTagName("meta")["theme-color"].content = paletteDarkVibrant;  // Syncing browser theme
   }
 
@@ -350,7 +369,7 @@
   }
 </script>
 
-<main style="
+<main class={Object.keys(selectedSeries).length > 1 ? "compare-available" : ""} style="
   --DarkMuted: {paletteDarkMuted};
   --DarkVibrant: {paletteDarkVibrant};
   --LightMuted: {paletteLightMuted};
@@ -365,7 +384,7 @@
   {#if !inCompareMode}
     <!-- TODO: Figure out staggered scaling -->
     <div role="presentation" transition:scale={{ start: 0.8, opacity: 0.8 }}>
-      <section class="top-area {activeSeries == null ? " fresh-start" : ""} {Object.keys(selectedSeries).length > 1 ? " compare-available" : ""}">
+      <section class="top-area {activeSeries == null ? " fresh-start" : ""}">
         <section class="active-series-poster">
           {#if activeSeries?.thumbnail}
             <img src={activeSeries.thumbnail} class="poster" alt="Poster for {activeSeries.title} ({activeSeries.year})"/>
@@ -392,9 +411,11 @@
               <big>
                 <span>It will take you</span>
                 <br/>
-                <strong>{activeSeriesHumanizedRuntime}</strong>{#if activeSeries.runtimeWasImputed}
-                  <span class="help-text" title="This series' runtime had gaps that were filled in with approximation.">*</span>
-                {/if}
+                <strong>
+                  {activeSeriesHumanizedRuntime}{#if activeSeries.runtimeWasImputed}
+                    <span class="help-text" tabindex="-1" title="This series' runtime had gaps that were filled in with approximation.">*</span>
+                  {/if}
+                  </strong>
                 <br/>
                 <span>to watch</span>
                 <br/>
@@ -415,7 +436,7 @@
       </section>
       {#if (Object.keys(activeSeries?.episodesBySeason || {}).length)}
         <section
-          class="bottom-area {activeSeries == null ? " fresh-start" : ""} {Object.keys(selectedSeries).length > 1 ? " compare-available" : ""}"
+          class="bottom-area {activeSeries == null ? " fresh-start" : ""}"
           out:scale={{ start: 0.8, opacity: 0.5 }}
           in:scale={{ start: 0.8, opacity: 0.5 }}
         >
@@ -445,7 +466,7 @@
       }}
     />
   {/if}
-  <footer>
+  <footer class={inCompareMode ? "compare-active" : "" + Object.keys(selectedSeries).length > 1 ? " compare-available" : ""}>
     <small>Designed by <a href="https://antrikshy.com">Antriksh Yadav</a>. Source <a href="https://github.com/Antrikshy/TotalRuntime" target="_blank">on GitHub</a>. Data from <a href="https://thetvdb.com" target="_blank">TheTVDB</a>.</small>
   </footer>
 </main>
