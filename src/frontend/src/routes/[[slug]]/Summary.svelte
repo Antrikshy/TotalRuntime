@@ -77,11 +77,11 @@
 
 <script>
   import { createEventDispatcher } from "svelte"
-  import { humanizeRuntime } from "$lib/util.js"
 
   const dispatch = createEventDispatcher()
 
   export let seriesMetadata
+  export let context
   export let rank
 </script>
 
@@ -90,7 +90,7 @@
   <button class="close-button" on:click={_ => dispatch("deselectSeries", seriesMetadata.tvdbId)}>✖</button>
   <div class="summary-text">
     <strong>{seriesMetadata.title}</strong>
-    {humanizeRuntime(seriesMetadata.totalRuntime)}
+    {context}
   </div>
   {#if seriesMetadata.thumbnail}
     <img src={seriesMetadata.thumbnail} class="poster" alt="Poster for {seriesMetadata.title} ({seriesMetadata.year})"/>

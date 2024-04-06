@@ -75,25 +75,33 @@
   import { blur } from "svelte/transition"
 
   import Summary from "./Summary.svelte"
+  import { humanizeRuntime } from "$lib/util.js"
 
   const dispatch = createEventDispatcher()
 
   const sortModes = [
+    // name = "Sort by" string
+    // fetcher = function to fetch sort-comparable value
+    // transformer = function to transform fetched value to UI-friendly
     {
       name: "Total runtime",
-      fetcher: series => series.totalRuntime
+      fetcher: series => series.totalRuntime,
+      transformer: value => humanizeRuntime(value)
     },
     {
       name: "Release year",
-      fetcher: series => series.year
+      fetcher: series => series.year,
+      transformer: value => value
     },
     {
       name: "Number of seasons",
-      fetcher: series => Object.keys(series.episodesBySeason || {}).length ?? undefined
+      fetcher: series => Object.keys(series.episodesBySeason || {}).length ?? undefined,
+      transformer: value => `${value} season${value != 1 ? "s" : ""}`
     },
     {
       name: "Number of episodes",
-      fetcher: series => Object.values(series.episodesBySeason || {}).reduce((total, season) => total += season.episodes.length, 0) ?? undefined
+      fetcher: series => Object.values(series.episodesBySeason || {}).reduce((total, season) => total += season.episodes.length, 0) ?? undefined,
+      transformer: value => `${value} episode${value != 1 ? "s" : ""}`
     }
   ]
 
@@ -107,6 +115,9 @@
     const [a, b] = sortAscending ? [l, r] : [r, l]
     return sortMode.fetcher(a) - sortMode.fetcher(b)
   })
+  $: if (!Object.keys(selectedSeries).length) {
+    dispatch("closeCompareScreen")
+  }
 </script>
 
 <section
@@ -122,7 +133,12 @@
   </div>
   <ol>
     {#each sortedSummaries as series, rank}
-      <Summary seriesMetadata={series} rank={rank + 1} on:deselectSeries/>
+      <Summary
+        seriesMetadata={series}
+        context={sortMode.transformer(sortMode.fetcher(series))}
+        rank={rank + 1}
+        on:deselectSeries
+      />
     {/each}
   </ol>
   <form class="sort-controls">
