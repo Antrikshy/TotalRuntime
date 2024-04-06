@@ -44,6 +44,8 @@
       overflow-x: scroll;
       align-items: center;
       mask-image: linear-gradient(90deg, #000 90%, transparent 100%);
+      scrollbar-width: thin;
+      scrollbar-color: var(--MutedTextColor) var(--Muted);
       @include override-for-smaller-than(md-screen) {
         gap: 0.5rem;
         font-size: 0.8rem;
