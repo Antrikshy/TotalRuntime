@@ -10,8 +10,6 @@
     border: none;
     border-radius: 1rem;
     font-size: 2rem;
-    // TODO
-    font-family: "Pathway Extreme", sans-serif;
     transition: 0.15s;
     @include override-for-smaller-than(md-screen) {
       height: 3rem;
@@ -19,7 +17,7 @@
     }
     @include override-for-smaller-than(sm-screen) {
       height: 2.5rem;
-      font-size: 1rem;
+      font-size: 1.3rem;
     }
     &:not(.elevated):not(.fresh-start) {
       border-radius: unset;
@@ -31,9 +29,7 @@
     &:focus,
     &.fresh-start {
       outline: none;
-      box-shadow:
-        #3b3b3b80 0px 3px 10px,
-        #3b3b3b10 0px -2px 3px 2px inset;
+      box-shadow: #3b3b3b80 0px 3px 10px
     }
   }
 

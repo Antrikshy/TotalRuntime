@@ -1,6 +1,5 @@
 <style lang="scss">
   @import '../../lib/responsive.scss';
-  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Gilda+Display&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Literata:ital,opsz,wght@0,7..72,200..900;1,7..72,200..900&family=Pathway+Extreme:ital,opsz,wght@0,8..144,100..900;1,8..144,100..900&display=swap');
 
   main {
     ::selection {
@@ -16,11 +15,12 @@
     color: var(--DarkVibrantTextColor, var(--DarkColor));
     transition: 0.25s;
 
-    // TODO
-    font-family: "Pathway Extreme", sans-serif;
+    // TODO: Explore Lexend variants
+    font-family: "Lexend", sans-serif;
     font-optical-sizing: auto;
     font-weight: 400;
     font-style: normal;
+
     &.compare-available {
       @include override-for-larger-than(md-screen) {
         padding-right: 4.5rem;
@@ -112,6 +112,7 @@
         height: 24rem;
         padding: 1rem;
         display: flex;
+        gap: 2rem;
         flex-direction: column;
         align-items: center;
         justify-content: center;
@@ -131,13 +132,18 @@
           background: linear-gradient(to right, transparent, var(--Muted) 25%) !important;
         }
 
-        // TODO
-        font-family: "Gilda Display", serif;
-        font-optical-sizing: auto;
-        // font-weight: 600;
-        font-style: normal;
+        .intro-text {
+          font-size: 1.5rem;
+          @include override-for-smaller-than(sm-screen) {
+            font-size: 1rem;
+          }
+        }
 
         big {
+          font-family: "Gilda Display", serif;
+          font-optical-sizing: auto;
+          font-weight: 400;
+          font-style: normal;
           font-size: 3rem;
           line-height: 3.5rem;
           @include override-for-smaller-than(md-screen) {
@@ -158,7 +164,6 @@
           }
 
           strong {
-            font-family: "Libre Baskerville", serif;
             font-family: "DM Serif Display", serif;
             font-weight: 800;
           }
@@ -428,8 +433,8 @@
                 <strong>{activeSeries.title}</strong>
               </big>
             {:else}
-              <strong>Check and compare TV series runtimes, by season or in their entirety.</strong>
-              <big>Search to begin.</big>
+              <strong class="intro-text">Check and compare TV series runtimes, by season or in their entirety.</strong>
+              <strong class="intro-text">Search to begin.</strong>
             {/if}
           </section>
         </summary>

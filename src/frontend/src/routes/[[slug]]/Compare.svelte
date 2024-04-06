@@ -72,7 +72,7 @@
 
 <script>
   import { createEventDispatcher } from "svelte"
-  import { fly } from "svelte/transition"
+  import { blur } from "svelte/transition"
 
   import Summary from "./Summary.svelte"
 
@@ -111,8 +111,7 @@
 
 <section
   class="compare-screen"
-  in:fly={{ x: "100vw", duration: 500, delay: 100 }}
-  out:fly={{ x: "100vw", duration: 500, delay: 100 }}
+  transition:blur={{ duration: 500, delay: 100, amount: 10 }}
 >
   <div class="top-right-buttons">
     <button on:click={_ => {
