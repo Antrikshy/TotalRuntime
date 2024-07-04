@@ -2,6 +2,10 @@
   @import '../../lib/responsive.scss';
 
   main {
+    --tooltip-background-color: var(--DarkVibrant, #fff);
+    --tooltip-color: var(--DarkVibrantTextColor, var(--DarkColor));
+    --tooltip-font-family: "Lexend", sans-serif;
+
     ::selection {
       background-color: var(--LightVibrant);
       color: var(--LightVibrantTextColor);
@@ -237,7 +241,7 @@
     bottom: 0;
     text-align: center;
     transition: 0.25s;
-    @include override-for-smaller-than(sm-screen) {
+    @include override-for-smaller-than(md-screen) {
       font-size: small;
       &.compare-available {
         margin-bottom: 3rem;
@@ -259,6 +263,7 @@
 
   import Vibrant from "node-vibrant"
   import { textContrast } from "text-contrast"
+  import { tooltip } from "@svelte-plugins/tooltips";
 
   import { humanizeRuntime } from "$lib/util.js"
 
@@ -418,7 +423,7 @@
                 <br/>
                 <strong>
                   {activeSeriesHumanizedRuntime}{#if activeSeries.runtimeWasImputed}
-                    <span class="help-text" tabindex="-1" title="This series' runtime had gaps that were filled in with approximation.">*</span>
+                    <span class="help-text" tabindex="-1" title="This series' runtime had gaps that were filled in with approximation." use:tooltip={{animation: "slide"}}>*</span>
                   {/if}
                   </strong>
                 <br/>

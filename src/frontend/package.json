@@ -16,6 +16,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@svelte-plugins/tooltips": "^3.0.0",
 		"axios": "^1.6.7",
 		"debounce": "^2.0.0",
 		"humanize-duration": "^3.31.0",

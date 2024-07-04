@@ -80,9 +80,9 @@
   const dispatch = createEventDispatcher()
 
   const sortModes = [
-    // name = "Sort by" string
-    // fetcher = function to fetch sort-comparable value
-    // transformer = function to transform fetched value to UI-friendly
+    // name: "Sort by" string
+    // fetcher: function to fetch sort-comparable value
+    // transformer: function to transform fetched value to UI-friendly
     {
       name: "Total runtime",
       fetcher: series => series.totalRuntime,

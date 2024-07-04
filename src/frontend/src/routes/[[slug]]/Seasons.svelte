@@ -69,6 +69,8 @@
 <script>
   import { humanizeRuntime } from "$lib/util.js"
 
+  import { tooltip } from "@svelte-plugins/tooltips";
+
   export let activeSeriesEpisodesBySeason
 </script>
 
@@ -78,7 +80,7 @@
       <div><big>Season {seasonNum}</big></div>
       <div><small>
         {humanizeRuntime(season.totalRuntime)}{#if season.runtimeWasImputed}
-          <span class="help-text" tabindex="-1" title="This season's runtime had gaps that were filled in with approximation.">*</span>
+          <span class="help-text" tabindex="-1" title="This season's runtime had gaps that were filled in with approximation." use:tooltip={{animation: "slide"}}>*</span>
         {/if}
       </small></div>
       <div><small>{season.episodes.length} episodes</small></div>
@@ -91,9 +93,9 @@
           {#if episode.runtime}
             <span class={episode.runtimeQuality != "fetchedRaw" ? "low-quality-runtime" : ""}>
               {episode.runtime} minutes{#if episode.runtimeQuality == "fetchedAverage"}
-                <sup class="help-text" tabindex="-1" title="Inferred from official series average runtime, as episode runtime was unavailable.">1</sup>
+                <sup class="help-text" tabindex="-1" title="Inferred from official series average runtime, as episode runtime was unavailable." use:tooltip={{position: "left", animation: "slide"}}>1</sup>
               {:else if episode.runtimeQuality == "computedAverage"}
-                <sup class="help-text" tabindex="-1" title="Computed median runtime for season, as episode runtime and official series average were unavailable.">2</sup>
+                <sup class="help-text" tabindex="-1" title="Computed median runtime for season, as episode runtime and official series average were unavailable." use:tooltip={{position: "left", animation: "slide"}}>2</sup>
               {/if}
             </span>
           {:else}
