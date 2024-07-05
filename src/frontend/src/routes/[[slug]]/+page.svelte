@@ -15,7 +15,7 @@
     padding: 1rem 3rem;
     box-sizing: border-box;
     position: relative;
-    background-color: var(--DarkVibrant, #fff);
+    background: linear-gradient(var(--DarkVibrant, #fff) 0, var(--DarkMuted, #fff) 125%);
     color: var(--DarkVibrantTextColor, var(--DarkColor));
     transition: 0.25s;
 
@@ -325,7 +325,6 @@
   function handleFoundSeriesEpisodes(e) {
     // Function also updates selectedSeries by reference
     const episodes = e.detail
-    activeSeries.numOfEpisodes = episodes.length
     activeSeries.episodesBySeason = {}
     if (!episodes.length) {
       return;
@@ -371,6 +370,8 @@
         activeSeriesHumanizedRuntime = humanizeRuntime(activeSeries.totalRuntime)
         if (activeSeries.thumbnail) {
           inferColorPalette()
+          activeSeries.summaryBackgroundColor = paletteLightVibrant
+          activeSeries.summaryTextColor = paletteLightVibrantTextColor
         }
       } else {
         activeSeriesHumanizedRuntime = ""
@@ -392,7 +393,6 @@
 ">
   <h1 class="logo"><a href="/">Total Runtime</a></h1>
   {#if !inCompareMode}
-    <!-- TODO: Figure out staggered scaling -->
     <div role="presentation" transition:scale={{ start: 0.8, opacity: 0.8 }}>
       <section class="top-area {activeSeries == null ? " fresh-start" : ""}">
         <section class="active-series-poster">
@@ -415,7 +415,6 @@
           <!-- CSS inline because URLs don't translate from Svelte to CSS variables well -->
           <section class="active-series-runtime" style="
             background-image: linear-gradient(to bottom, transparent 0, var(--Muted) 95%), url({activeSeries?.thumbnail});
-            <!-- background-color: var(--DarkVibrant); -->
           ">
             {#if activeSeriesHumanizedRuntime}
               <big>

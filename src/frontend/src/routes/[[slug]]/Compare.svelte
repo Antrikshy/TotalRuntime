@@ -4,7 +4,7 @@
   .compare-screen {
     height: 100vh;
     width: 100vw;
-    padding: 5rem 3rem 13rem;
+    padding: 5rem 3rem 15rem;
     box-sizing: border-box;
     position: fixed;
     top: 0;

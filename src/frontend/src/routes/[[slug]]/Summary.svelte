@@ -85,7 +85,10 @@
   export let rank
 </script>
 
-<li class="comparable-series-summary">
+<li class="comparable-series-summary" style="
+    background-color: {seriesMetadata.summaryBackgroundColor};
+    color: {seriesMetadata.summaryTextColor};
+  ">
   <strong class="rank-indicator">{rank}</strong>
   <button class="close-button" on:click={_ => dispatch("deselectSeries", seriesMetadata.tvdbId)}>✖</button>
   <div class="summary-text">
