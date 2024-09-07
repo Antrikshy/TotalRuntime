@@ -83,7 +83,7 @@
           <span class="help-text" tabindex="-1" title="This season's runtime had gaps that were filled in with approximation." use:tooltip={{animation: "slide"}}>*</span>
         {/if}
       </small></div>
-      <div><small>{season.episodes.length} episodes</small></div>
+      <div><small>{season.episodes.length} {`episode${season.episodes.length == 1 ? "" : "s"}`}</small></div>
     </summary>
     <div class="episode-list">
       {#each Object.values(season.episodes) as episode}

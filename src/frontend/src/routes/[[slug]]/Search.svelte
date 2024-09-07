@@ -19,7 +19,7 @@
       height: 2.5rem;
       font-size: 1.3rem;
     }
-    &:not(.elevated):not(.fresh-start) {
+    &:not(.elevated):not(.fresh-start):not(.no-poster) {
       border-radius: unset;
       border-top-right-radius: 1rem;
       @include override-for-smaller-than(md-screen) {
@@ -29,7 +29,10 @@
     &:focus,
     &.fresh-start {
       outline: none;
-      box-shadow: #3b3b3b80 0px 3px 10px
+      box-shadow: #3b3b3b80 0px 3px 10px;
+    }
+    &.no-poster {
+      border-top-left-radius: 1rem;
     }
   }
 
@@ -91,6 +94,7 @@
 
   export let searchQuery
   export let freshStart = true
+  export let noPoster = true
 
   let searchResults = []
   let hoveredSearchResult = 0
@@ -150,7 +154,7 @@
   <!-- svelte-ignore a11y-autofocus -->
   <input
     type="text"
-    class={"search-bar" + (searchQuery.length || freshStart ? " elevated" : "") + (freshStart ? " fresh-start" : "")}
+    class={`search-bar ${searchQuery.length || freshStart ? " elevated" : ""} ${freshStart ? " fresh-start" : ""} ${noPoster ? "no-poster" : ""}`}
     placeholder="Search for series"
     autofocus={freshStart}
     auAvoidtocomplete="off"

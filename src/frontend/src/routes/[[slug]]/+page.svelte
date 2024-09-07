@@ -332,7 +332,7 @@
     activeSeries.totalRuntime = episodes.reduce((total, ep) => total + ep.runtime, 0)
     activeSeries.runtimeWasImputed = false
     episodes.forEach(ep => {
-      const { season, episode } = ep
+      const { season } = ep
       if (!activeSeries.episodesBySeason[season]) {
         activeSeries.episodesBySeason[season] = {
           totalRuntime: 0,
@@ -340,7 +340,7 @@
           episodes: []
         }
       }
-      activeSeries.episodesBySeason[season]["episodes"][episode] = ep
+      activeSeries.episodesBySeason[season]["episodes"].push(ep)
       activeSeries.episodesBySeason[season]["totalRuntime"] += ep.runtime
       if (ep.runtimeQuality != "fetchedRaw") {
         activeSeries.runtimeWasImputed = true
@@ -350,6 +350,7 @@
   }
 
   async function inferColorPalette() {
+    // Only call when thumbnail is available
     const palette = await Vibrant.from(activeSeries.thumbnail).getPalette()
     paletteDarkMuted = palette["DarkMuted"]?.hex
     paletteDarkVibrant = palette["DarkVibrant"]?.hex
@@ -363,6 +364,20 @@
     document.getElementsByTagName("meta")["theme-color"].content = paletteDarkVibrant;  // Syncing browser theme
   }
 
+  function resetColorPalette() {
+    // Clears any color palette applied to the whole page
+    paletteDarkMuted = undefined
+    paletteDarkVibrant = undefined
+    paletteLightMuted = undefined
+    paletteLightVibrant = undefined
+    paletteMuted = undefined
+    paletteVibrant = undefined
+    paletteMutedTextColor = undefined
+    paletteDarkVibrantTextColor = undefined
+    paletteLightVibrantTextColor = undefined
+    document.getElementsByTagName("meta")["theme-color"].content = undefined;  // Clearing browser theme
+  }
+
   let activeSeriesHumanizedRuntime = null
   $: {
     if (activeSeries) {
@@ -372,6 +387,8 @@
           inferColorPalette()
           activeSeries.summaryBackgroundColor = paletteLightVibrant
           activeSeries.summaryTextColor = paletteLightVibrantTextColor
+        } else {
+          resetColorPalette()
         }
       } else {
         activeSeriesHumanizedRuntime = ""
@@ -406,6 +423,7 @@
           <aside class="search-area {searchQuery.length ? "elevated" : ""}">
             <Search
               freshStart={activeSeries == null}
+              noPoster={activeSeries?.thumbnail == null}
               bind:searchQuery
               on:newUrlPath={handleShallowRouting}
               on:resultSeries={handleFoundSeriesMetadata}
