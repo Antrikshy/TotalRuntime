@@ -86,6 +86,7 @@
   import { createEventDispatcher } from "svelte"
   import { afterNavigate } from "$app/navigation"
   import { page } from "$app/stores"
+  import { PUBLIC_BACKEND_PORT } from '$env/static/public';
 
   import axios from "axios"
   import debounce from "debounce"
@@ -112,7 +113,7 @@
       return
     }
     /* Uses current value of searchQuery */
-    axios.get(`${$page.url.protocol}//${$page.url.hostname}:3000/search?q=${searchQuery}`).then(res => {
+    axios.get(`${$page.url.protocol}//${$page.url.hostname}:${PUBLIC_BACKEND_PORT}/search?q=${searchQuery}`).then(res => {
       searchResults = res.data
     }).catch(err => {
       // TODO
@@ -122,7 +123,7 @@
 
   function fetchSeriesMetadata(id) {
     if (!id) return
-    axios.get(`${$page.url.protocol}//${$page.url.hostname}:3000/series?id=${id}`).then(res => {
+    axios.get(`${$page.url.protocol}//${$page.url.hostname}:${PUBLIC_BACKEND_PORT}/series?id=${id}`).then(res => {
       selectTitle(res.data)
     }).catch(err => {
       // TODO
@@ -132,7 +133,7 @@
 
   function fetchEpisodeMetadata(id) {
     if (!id) return
-    axios.get(`${$page.url.protocol}//${$page.url.hostname}:3000/episodes?id=${id}`).then(res => {
+    axios.get(`${$page.url.protocol}//${$page.url.hostname}:${PUBLIC_BACKEND_PORT}/episodes?id=${id}`).then(res => {
       dispatch("resultEpisodes", res.data)
     }).catch(err => {
       // TODO

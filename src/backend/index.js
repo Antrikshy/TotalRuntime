@@ -21,7 +21,6 @@ tvdb.interceptors.response.use(res => res, err => {
       // Retry the original request
       return tvdb(err.config)
     }).catch(err => {
-      // TODO
       fastify.log.error(`Couldn't fetch token! ${err}`)
     })
   } else {
@@ -49,8 +48,7 @@ fastify.get("/search", (request, reply) => {
       reply.code(204).send()
     }
   }).catch(err => {
-    // TODO
-    fastify.log.error(err.response.status)
+    fastify.log.error(`/search failed: ${err.message}`, err)
     reply.code(500).send("Internal server error")
   })
 })
@@ -62,7 +60,7 @@ fastify.get("/series", (request, reply) => {
   if (!tvdbId || isNaN(tvdbId)) { reply.code(404).send() }
   tvdb.get(`/series/${tvdbId}/extended`, { params: { short: true } }).then(res => {
     const rawResult = res.data["data"]
-    // TODO: What if nothing found?
+    if (!rawResult) { reply.send(404) }
     reply.send({
       "title": rawResult["translations"]?.["eng"] ?? rawResult["name"],
       "year": rawResult["year"],
@@ -72,8 +70,7 @@ fastify.get("/series", (request, reply) => {
       "slug": `${rawResult["id"]}-${rawResult["slug"]}`
     })
   }).catch(err => {
-    // TODO
-    fastify.log.error(err.response.status)
+    fastify.log.error(`/series failed: ${err.message}`, err)
     reply.code(500).send("Internal server error")
   })
 })
@@ -105,10 +102,9 @@ fastify.get("/episodes", (request, reply) => {
         runtimesBySeason[episode["season"]][episode["episode"]] = episode["runtime"]
       })
       compactEpisodes.forEach(episode => {
-        // TODO: Future releases?
         // Second pass - imputation
         if (!episode["runtime"]) {
-          const runtimeForThisSeason = runtimesBySeason[episode["season"]].filter(Boolean)  // TODO: What if all empty?
+          const runtimeForThisSeason = runtimesBySeason[episode["season"]].filter(Boolean)
           averageBySeason[episode["season"]] ??= Math.round(median(runtimeForThisSeason))  // Memoization
           episode["runtime"] = averageBySeason[episode["season"]]
           episode["runtimeQuality"] = "computedAverage"
@@ -117,9 +113,7 @@ fastify.get("/episodes", (request, reply) => {
     }
   }
   tvdb.get(`/series/${tvdbId}/episodes/official`, { params: { page: 0 } }).then(res => {
-    // res.data["data"]["series"]["averageRuntime"] = undefined  // TODO: For manual testing; remove
     const compactEpisodes = res.data["data"]?.["episodes"]
-      // .map(episode => episode["number"] % 5 == 0 ? {...episode, runtime: undefined} : episode)  // TODO: For manual testing; remove
       .filter(episode =>
         // Skipping season 0 (often bonus content)
         episode["seasonNumber"] && episode["seasonNumber"] != 0
@@ -140,13 +134,12 @@ fastify.get("/episodes", (request, reply) => {
       reply.code(204).send()
     }
   }).catch(err => {
-    // TODO
-    fastify.log.error(err.response.status)
+    fastify.log.error(`/series/.../episodes/official failed: ${err.message}`, err)
     reply.code(500).send("Internal server error")
   })
 })
 
-fastify.listen({ host: "::", port: 3000 }, (err) => {
+fastify.listen({ host: "::", port: process.env.PUBLIC_BACKEND_PORT }, (err) => {
   if (err) {
     fastify.log.error(err)
     process.exit(1)
