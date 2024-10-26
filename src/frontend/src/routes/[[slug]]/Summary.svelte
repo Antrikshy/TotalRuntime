@@ -1,5 +1,5 @@
 <style lang="scss">
-  @import '../../lib/responsive.scss';
+  @use '../../lib/responsive.scss' as *;
 
   .comparable-series-summary {
     height: 8rem;

@@ -1,0 +1,65 @@
+#!/bin/bash
+
+# Written with help from ChatGPT in Oct 2024
+
+# Usage function
+usage() {
+  echo "Usage: $0 <PUBLIC_BACKEND_PORT> <PUBLIC_FRONTEND_PORT> <API_KEY>"
+  exit 1
+}
+
+# Check if the required arguments are provided
+if [ $# -ne 3 ]; then
+  usage
+fi
+
+# Get CLI arguments
+PUBLIC_BACKEND_PORT=$1
+PUBLIC_FRONTEND_PORT=$2
+TVDB_API_KEY=$3
+
+# Set environment variables for production
+export NODE_ENV=development
+export PUBLIC_BACKEND_PORT=$PUBLIC_BACKEND_PORT
+export PUBLIC_FRONTEND_PORT=$PUBLIC_FRONTEND_PORT
+export PORT=$PUBLIC_FRONTEND_PORT  # @sveltejs/adapter-node needs this
+export TVDB_API_KEY=$TVDB_API_KEY
+
+# Get the absolute path to the directory where the script resides
+SCRIPT_DIR=$(dirname "$(realpath "$0")")
+
+# Define absolute paths
+ROOT_DIR="$SCRIPT_DIR/.."
+BACKEND_DIR="$ROOT_DIR/src/backend"
+FRONTEND_DIR="$ROOT_DIR/src/frontend"
+FRONTEND_BUILD_DIR="$FRONTEND_DIR/build"
+
+# Install dependencies for all workspaces
+cd $ROOT_DIR
+echo "Installing dependencies for root..."
+npm install
+cd $BACKEND_DIR
+echo "Installing dependencies for backend..."
+npm install
+cd $FRONTEND_DIR
+echo "Installing dependencies for frontend..."
+npm install
+
+# Check if frontend is built, if not build it
+cd $FRONTEND_DIR
+if [ ! -d "$FRONTEND_BUILD_DIR" ]; then
+  echo "Building frontend..."
+  # Get ready for production
+  export NODE_ENV=production
+  npm run build
+fi
+
+# Go back to root dir
+cd $ROOT_DIR
+
+# Use concurrently to start both backend and frontend in the foreground
+# This way, systemd stop/restart will reliably terminate both
+echo "Starting backend and frontend..."
+npx concurrently \
+  "node $BACKEND_DIR" \
+  "node $FRONTEND_BUILD_DIR"

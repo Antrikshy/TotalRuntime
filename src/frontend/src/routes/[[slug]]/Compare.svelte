@@ -1,5 +1,5 @@
 <style lang="scss">
-  @import '../../lib/responsive.scss';
+  @use '../../lib/responsive.scss' as *;
 
   .compare-screen {
     height: 100vh;

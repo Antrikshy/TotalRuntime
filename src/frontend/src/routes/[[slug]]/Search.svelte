@@ -1,5 +1,5 @@
 <style lang="scss">
-  @import '../../lib/responsive.scss';
+  @use '../../lib/responsive.scss' as *;
 
   .search-bar {
     height: 4rem;
@@ -49,13 +49,6 @@
     }
 
     .search-result {
-      .poster {
-        height: 4rem;
-        @include override-for-smaller-than(sm-screen) {
-          height: 3rem;
-        }
-      }
-
       // Is a <button> for accessibility, resetting styles
       all: initial;
       font: inherit;
@@ -77,6 +70,13 @@
       &.hovered {
         background-color: var(--DarkVibrant, var(--DarkColor));
         color: var(--DarkVibrantTextColor, #fff);
+      }
+
+      .poster {
+        height: 4rem;
+        @include override-for-smaller-than(sm-screen) {
+          height: 3rem;
+        }
       }
     }
   }
