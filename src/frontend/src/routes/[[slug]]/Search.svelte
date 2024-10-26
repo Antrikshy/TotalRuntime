@@ -10,6 +10,7 @@
     border: none;
     border-radius: 1rem;
     font-size: 2rem;
+    font-family: inherit;
     transition: 0.15s;
     @include override-for-smaller-than(md-screen) {
       height: 3rem;

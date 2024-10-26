@@ -1,0 +1,22 @@
+$bold-classy-font-stack: "DM Serif Display", serif;
+$regular-classy-font-stack: "Gilda Display", serif;
+$base-font-stack: "Lexend", sans-serif;
+
+@mixin bold-classy {
+  font-family: $bold-classy-font-stack;
+  font-weight: 800;
+}
+
+@mixin regular-classy {
+  font-family: $regular-classy-font-stack;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+
+@mixin base {
+  font-family: $base-font-stack;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}

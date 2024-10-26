@@ -1,14 +1,15 @@
 <style lang="scss">
   @use '../../lib/responsive.scss' as *;
+  @use '../../lib/typography.scss' as type;
 
   main {
     --tooltip-background-color: var(--DarkVibrant, #fff);
     --tooltip-color: var(--DarkVibrantTextColor, var(--DarkColor));
-    --tooltip-font-family: "Lexend", sans-serif;
+    --tooltip-font-family: type.$base-font-stack;
 
     ::selection {
-      background-color: var(--LightVibrant);
-      color: var(--LightVibrantTextColor);
+      background-color: var(--LightVibrant, #000);
+      color: var(--LightVibrantTextColor, #fff);
     }
 
     min-height: 100vh;
@@ -19,11 +20,7 @@
     color: var(--DarkVibrantTextColor, var(--DarkColor));
     transition: 0.25s;
 
-    // TODO: Explore Lexend variants
-    font-family: "Lexend", sans-serif;
-    font-optical-sizing: auto;
-    font-weight: 400;
-    font-style: normal;
+    @include type.base;
 
     &.compare-available {
       @include override-for-larger-than(md-screen) {
@@ -39,6 +36,7 @@
     text-align: center;
     margin-top: 0;
     cursor: default;
+    font-family: type.$base-font-stack;
 
     a {
       text-decoration: none;
@@ -138,18 +136,16 @@
 
         .intro-text {
           font-size: 1.5rem;
+
           @include override-for-smaller-than(sm-screen) {
             font-size: 1rem;
           }
         }
 
         big {
-          font-family: "Gilda Display", serif;
-          font-optical-sizing: auto;
-          font-weight: 400;
-          font-style: normal;
           font-size: 3rem;
           line-height: 3.5rem;
+          @include type.regular-classy;
           @include override-for-smaller-than(md-screen) {
             font-size: 2rem;
             line-height: 2.3rem;
@@ -168,8 +164,7 @@
           }
 
           strong {
-            font-family: "DM Serif Display", serif;
-            font-weight: 800;
+            @include type.bold-classy;
           }
         }
       }
@@ -455,8 +450,8 @@
                 <strong>{activeSeries.title}</strong>
               </big>
             {:else}
-              <strong class="intro-text">Check and compare TV series runtimes, by season or in their entirety.</strong>
-              <strong class="intro-text">Search to begin.</strong>
+              <span class="intro-text">Find and compare TV series runtimes, by season or in their entirety.</span>
+              <span class="intro-text">Search to begin.</span>
             {/if}
           </section>
         </summary>
