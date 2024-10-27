@@ -45,14 +45,12 @@ cd $FRONTEND_DIR
 echo "Installing dependencies for frontend..."
 npm install
 
-# Check if frontend is built, if not build it
+# Build frontend for SSR
 cd $FRONTEND_DIR
-if [ ! -d "$FRONTEND_BUILD_DIR" ]; then
-  echo "Building frontend..."
-  # Get ready for production
-  export NODE_ENV=production
-  npm run build
-fi
+echo "Building frontend..."
+# Get ready for production
+export NODE_ENV=production
+npm run build
 
 # Go back to root dir
 cd $ROOT_DIR
