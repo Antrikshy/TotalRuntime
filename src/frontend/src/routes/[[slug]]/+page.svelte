@@ -488,6 +488,6 @@
     />
   {/if}
   <footer class={inCompareMode ? "compare-active" : "" + Object.keys(selectedSeries).length > 1 ? " compare-available" : ""}>
-    <small>Designed by <a href="https://antrikshy.com">Antriksh Yadav</a>. Source <a href="https://github.com/Antrikshy/TotalRuntime" target="_blank">on GitHub</a>. Data from <a href="https://thetvdb.com" target="_blank">TheTVDB</a>.</small>
+    <small>Designed by <a href="https://antrikshy.com">Antriksh Yadav</a>. Source <a href="https://github.com/Antrikshy/TotalRuntime" target="_blank">on GitHub</a>. Data from <a href="https://thetvdb.com" target="_blank">TheTVDB</a>. Uses <a href="https://support.google.com/analytics/answer/6004245?sjid=1476110778839677937-NC" target="_blank">Google Analytics</a>.</small>
   </footer>
 </main>
