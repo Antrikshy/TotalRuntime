@@ -19,15 +19,14 @@
     }
 
     .season-summary {
-      font-size: 1.5rem;
+      font-size: 1.3rem;
+      line-height: 1.5rem;
       display: flex;
       flex-direction: column;
       justify-content: center;
       @include override-for-smaller-than(md-screen) {
         text-align: center;
         font-size: 1rem;
-      }
-      @include override-for-smaller-than(sm-screen) {
         line-height: 1.2rem;
       }
 
@@ -39,16 +38,18 @@
     .episode-list {
       padding-right: 10%;
       display: flex;
-      gap: 1rem;
-      font-size: 1.2rem;
+      gap: 0.5rem;
+      font-size: 1.15rem;
+      line-height: 1.5rem;
       overflow-x: scroll;
       align-items: center;
       mask-image: linear-gradient(90deg, #000 90%, transparent 100%);
       scrollbar-width: thin;
       scrollbar-color: var(--MutedTextColor) var(--Muted);
       @include override-for-smaller-than(md-screen) {
-        gap: 0.5rem;
-        font-size: 0.8rem;
+        gap: 0.15rem;
+        font-size: 0.85rem;
+        line-height: 1.15rem;
       }
 
       .episode {

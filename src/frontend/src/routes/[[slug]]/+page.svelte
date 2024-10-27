@@ -33,10 +33,10 @@
   }
 
   h1.logo {
-    text-align: center;
     margin-top: 0;
+    text-align: center;
+    line-height: 2rem;
     cursor: default;
-    font-family: type.$base-font-stack;
 
     a {
       text-decoration: none;
@@ -136,10 +136,6 @@
 
         .intro-text {
           font-size: 1.5rem;
-
-          @include override-for-smaller-than(sm-screen) {
-            font-size: 1rem;
-          }
         }
 
         big {
@@ -459,7 +455,6 @@
       {#if (Object.keys(activeSeries?.episodesBySeason || {}).length)}
         <section
           class="bottom-area {activeSeries == null ? " fresh-start" : ""}"
-          out:scale={{ start: 0.8, opacity: 0.5 }}
           in:scale={{ start: 0.8, opacity: 0.5 }}
         >
           <Seasons activeSeriesEpisodesBySeason={activeSeries.episodesBySeason}/>
@@ -468,7 +463,7 @@
     </div>
   {/if}
   {#if Object.keys(selectedSeries).length > 1 && !inCompareMode}
-    <nav class="compare-screen-pull-tab" in:fly={{ x: "100vw", duration: 250 }}>
+    <nav class="compare-screen-pull-tab" in:fly={{ x: "100vw" }}>
       <button on:click={_ => showCompareScreen(true)}>
         Compare {Object.keys(selectedSeries).length} series
       </button>

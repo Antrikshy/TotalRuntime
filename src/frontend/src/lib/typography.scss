@@ -1,9 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Gilda+Display&family=Sarala:wght@400;700&display=swap');
+
 $bold-classy-font-stack: "DM Serif Display", serif;
 $regular-classy-font-stack: "Gilda Display", serif;
-$base-font-stack: "Lexend", sans-serif;
+$base-font-stack: "Sarala", sans-serif;
 
 @mixin bold-classy {
   font-family: $bold-classy-font-stack;
+  font-optical-sizing: auto;
   font-weight: 800;
 }
 
@@ -11,12 +14,10 @@ $base-font-stack: "Lexend", sans-serif;
   font-family: $regular-classy-font-stack;
   font-optical-sizing: auto;
   font-weight: 400;
-  font-style: normal;
 }
 
 @mixin base {
   font-family: $base-font-stack;
   font-optical-sizing: auto;
   font-weight: 400;
-  font-style: normal;
 }
