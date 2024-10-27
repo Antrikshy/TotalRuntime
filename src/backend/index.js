@@ -1,9 +1,14 @@
 import Fastify from "fastify"
+import cors from "@fastify/cors"
 import axios from "axios"
 import median from "just-median"
 
 const fastify = Fastify({
   logger: true
+})
+await fastify.register(cors, {
+  origin: process.env.NODE_ENV == "production" ? process.env.CORS_ORIGIN : "*",
+  methods: ["GET"],
 })
 
 const tvdb = axios.create({
@@ -29,8 +34,6 @@ tvdb.interceptors.response.use(res => res, err => {
 })
 
 fastify.get("/search", (request, reply) => {
-  reply.header("Access-Control-Allow-Origin", "*")
-  reply.header("Access-Control-Allow-Methods", "GET")
   const searchQuery = request.query.q.trim()
   if (!searchQuery) { reply.code(404).send() }
   tvdb.get("/search", { params: { query: searchQuery, type: "series", limit: 5, lang: "eng" } }).then(res => {
@@ -54,8 +57,6 @@ fastify.get("/search", (request, reply) => {
 })
 
 fastify.get("/series", (request, reply) => {
-  reply.header("Access-Control-Allow-Origin", "*")
-  reply.header("Access-Control-Allow-Methods", "GET")
   const tvdbId = request.query.id
   if (!tvdbId || isNaN(tvdbId)) { reply.code(404).send() }
   tvdb.get(`/series/${tvdbId}/extended`, { params: { short: true } }).then(res => {
@@ -76,8 +77,6 @@ fastify.get("/series", (request, reply) => {
 })
 
 fastify.get("/episodes", (request, reply) => {
-  reply.header("Access-Control-Allow-Origin", "*")
-  reply.header("Access-Control-Allow-Methods", "GET")
   const tvdbId = request.query.id
   if (!tvdbId || isNaN(tvdbId)) { reply.code(404).send() }
   function _imputeRuntimes(compactEpisodes, averageRuntime) {
@@ -139,7 +138,7 @@ fastify.get("/episodes", (request, reply) => {
   })
 })
 
-fastify.listen({ host: "::", port: process.env.PUBLIC_BACKEND_PORT }, (err) => {
+fastify.listen({ host: "::", port: process.env.BACKEND_INTERNAL_PORT }, (err) => {
   if (err) {
     fastify.log.error(err)
     process.exit(1)

@@ -8,6 +8,7 @@
   "author": "Antriksh Yadav",
   "dependencies": {
     "@fastify/cookie": "^9.3.1",
+    "@fastify/cors": "^8.0.0",
     "axios": "^1.6.7",
     "fastify": "^4.26.0",
     "just-median": "^2.2.0"
