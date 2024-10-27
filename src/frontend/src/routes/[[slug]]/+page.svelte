@@ -35,7 +35,7 @@
   h1.logo {
     margin-top: 0;
     text-align: center;
-    line-height: 2rem;
+
     cursor: default;
 
     a {
@@ -60,6 +60,10 @@
     display: flex;
     @include override-for-smaller-than(md-screen) {
       flex-direction: column;
+    }
+
+    &.fresh-start {
+      width: 75%;
     }
 
     .active-series-poster {

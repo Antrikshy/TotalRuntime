@@ -32,6 +32,9 @@
       outline: none;
       box-shadow: #3b3b3b80 0px 3px 10px;
     }
+    &.fresh-start {
+      margin-top: 25vh;
+    }
     &.no-poster {
       border-top-left-radius: 1rem;
     }
