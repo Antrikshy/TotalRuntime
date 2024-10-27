@@ -4,25 +4,25 @@
 
 # Usage function
 usage() {
-  echo "Usage: $0 <PUBLIC_BACKEND_PORT> <PUBLIC_FRONTEND_PORT> <API_KEY>"
+  echo "Usage: $0 <FIRST_PORT> <API_KEY>; FIRST_PORT needs to be first of 3 TCP ports that will be locked for this service."
   exit 1
 }
 
 # Check if the required arguments are provided
-if [ $# -ne 3 ]; then
+if [ $# -ne 2 ]; then
   usage
 fi
 
 # Get CLI arguments
-PUBLIC_BACKEND_PORT=$1
-PUBLIC_FRONTEND_PORT=$2
-TVDB_API_KEY=$3
+FIRST_PORT=$1
+TVDB_API_KEY=$2
 
 # Set environment variables for production
 export NODE_ENV=development
-export PUBLIC_BACKEND_PORT=$PUBLIC_BACKEND_PORT
-export PUBLIC_FRONTEND_PORT=$PUBLIC_FRONTEND_PORT
-export PORT=$PUBLIC_FRONTEND_PORT  # @sveltejs/adapter-node needs this
+export PUBLIC_BACKEND_REVERSE_PROXY_PORT=$FIRST_PORT
+export BACKEND_INTERNAL_PORT=$((++FIRST_PORT))
+export FRONTEND_INTERNAL_PORT=$((++FIRST_PORT))
+export PORT=$FRONTEND_INTERNAL_PORT  # @sveltejs/adapter-node needs this
 export TVDB_API_KEY=$TVDB_API_KEY
 
 # Get the absolute path to the directory where the script resides
