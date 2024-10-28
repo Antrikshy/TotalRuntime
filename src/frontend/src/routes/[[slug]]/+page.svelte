@@ -403,7 +403,7 @@
   --DarkVibrantTextColor: {paletteDarkVibrantTextColor};
   --LightVibrantTextColor: {paletteLightVibrantTextColor};
 ">
-  <h1 class="logo"><a href="/">Total Runtime</a></h1>
+  <h1 class="logo"><a href="/" tabindex="-1">Total Runtime</a></h1>
   {#if !inCompareMode}
     <div role="presentation" transition:scale={{ start: 0.8, opacity: 0.8 }}>
       <section class="top-area {activeSeries == null ? " fresh-start" : ""}">
