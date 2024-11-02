@@ -19,9 +19,9 @@
 
     .rank-indicator {
       min-width: 1.5rem;
-      padding: 0.5rem;
+      padding: 0.25rem 0.5rem;
       position: absolute;
-      top: -1.5rem;
+      top: -1.75rem;
       left: -0.5rem;
       font-size: xx-large;
       text-align: center;

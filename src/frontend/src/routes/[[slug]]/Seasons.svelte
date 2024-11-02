@@ -41,7 +41,7 @@
       gap: 0.5rem;
       font-size: 1.15rem;
       line-height: 1.5rem;
-      overflow-x: scroll;
+      overflow: scroll hidden;
       align-items: center;
       mask-image: linear-gradient(90deg, #000 90%, transparent 100%);
       scrollbar-width: thin;

@@ -269,6 +269,7 @@
   let activeSeries = null
   let selectedSeries = {}
   let inCompareMode = false
+  let pageTitle = "Total Runtime"
 
   let searchQuery = ""
 
@@ -285,7 +286,7 @@
   afterNavigate(e => {
     if (e?.to?.url?.pathname == "/" && e?.from) {
       showCompareScreen(false)
-      location.reload();
+      location.reload()
     }
     const slug = e?.to?.params?.slug
     if (slug == "compare") {
@@ -296,7 +297,7 @@
   })
 
   function showCompareScreen(show) {
-    if (inCompareMode == show) { return; }
+    if (inCompareMode == show) { return }
     if (show) {
       inCompareMode = true
       handleShallowRouting({detail: "compare"})
@@ -322,7 +323,7 @@
     const episodes = e.detail
     activeSeries.episodesBySeason = {}
     if (!episodes.length) {
-      return;
+      return
     }
     activeSeries.totalRuntime = episodes.reduce((total, ep) => total + ep.runtime, 0)
     activeSeries.runtimeWasImputed = false
@@ -356,7 +357,6 @@
     paletteMutedTextColor = textContrast.isLightOrDark(paletteMuted) === "dark" ? "#fff" : "var(--DarkColor)"
     paletteDarkVibrantTextColor = textContrast.isLightOrDark(paletteDarkVibrant) === "dark" ? "#fff" : "var(--DarkColor)"
     paletteLightVibrantTextColor = textContrast.isLightOrDark(paletteLightVibrant) === "dark" ? "#fff" : "var(--DarkColor)"
-    document.getElementsByTagName("meta")["theme-color"].content = paletteDarkVibrant;  // Syncing browser theme
   }
 
   function resetColorPalette() {
@@ -370,11 +370,13 @@
     paletteMutedTextColor = undefined
     paletteDarkVibrantTextColor = undefined
     paletteLightVibrantTextColor = undefined
-    document.getElementsByTagName("meta")["theme-color"].content = undefined;  // Clearing browser theme
   }
 
+  let pageDescription = null
   let activeSeriesHumanizedRuntime = null
   $: {
+    pageTitle = "Total Runtime"  // Reset
+    pageDescription = "Find and compare how long it will take you to watch TV shows, by season or start to end."  // Reset
     if (activeSeries) {
       if (activeSeries.totalRuntime) {
         activeSeriesHumanizedRuntime = humanizeRuntime(activeSeries.totalRuntime)
@@ -388,9 +390,30 @@
       } else {
         activeSeriesHumanizedRuntime = ""
       }
+      pageTitle = `"${activeSeries.title}" (${activeSeries.year}) - ${pageTitle}`
+      pageDescription = `How long will it take you to watch${activeSeries.episodesBySeason && Object.keys(activeSeries.episodesBySeason).length > 1 ? " all seasons of" : ""} "${activeSeries.title}" (${activeSeries.year})? Plus, find other shows to compare!`
     }
   }
 </script>
+
+<svelte:head>
+	<!-- Dynamic head tags for the whole site are set here -->
+
+  <title>{pageTitle}</title>
+  <meta name="description" content={pageDescription} />
+  <meta name="theme-color" content={paletteDarkVibrant ?? "#252525"} />
+
+  <meta property="og:site_name" content="Total Runtime" />
+  <meta property="og:title" content={pageTitle} />
+  <meta property="og:description" content={pageDescription} />
+  <meta property="og:type" content={activeSeries ? "video:tv_show" : "website"} />
+
+  {#if activeSeries}
+    <meta property="og:video:release_date" content={activeSeries.year} />
+    <meta property="og:video:duration" content={activeSeries.totalRuntime ? activeSeries.totalRuntime * 60 : null} />
+    <meta property="og:image" content={activeSeries.thumbnail} />
+  {/if}
+</svelte:head>
 
 <main class={Object.keys(selectedSeries).length > 1 ? "compare-available" : ""} style="
   --DarkMuted: {paletteDarkMuted};
