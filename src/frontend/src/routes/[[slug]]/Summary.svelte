@@ -11,7 +11,8 @@
     list-style: none;
     border-radius: 1rem;
     box-shadow:#00000080 0px 3px 15px;
-    background-color: #fff;
+    color: var(--DarkColor);
+    background-color: var(--LightColor);
     @include override-for-smaller-than(md-screen) {
       font-size: smaller;
       height: 6rem;
@@ -27,8 +28,8 @@
       text-align: center;
       border-radius: 0.5rem;
       box-shadow:#00000080 0px 3px 10px;
-      color: #fff;
-      background-color: var(--DarkColor);
+      color: var(--BackgroundColor);  // Opposite of light/dark color theme
+      background-color: var(--TextColor);  // Opposite of light/dark color theme
       @include override-for-smaller-than(md-screen) {
         padding: 0.25rem;
         top: -1.25rem;

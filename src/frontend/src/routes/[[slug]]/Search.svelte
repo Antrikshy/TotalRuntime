@@ -73,7 +73,7 @@
       }
       &.hovered {
         background-color: var(--DarkVibrant, var(--DarkColor));
-        color: var(--DarkVibrantTextColor, #fff);
+        color: var(--DarkVibrantTextColor, var(--LightColor));
       }
 
       .poster {

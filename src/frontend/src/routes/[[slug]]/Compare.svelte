@@ -10,7 +10,7 @@
     top: 0;
     left: 0;
     overflow-y: scroll;
-    background-color: #fff;
+    background-color: var(--BackgroundColor);
     color: var(--DarkColor);
     @include override-for-smaller-than(md-screen) {
       padding-left: 1.5rem;

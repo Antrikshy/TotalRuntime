@@ -3,24 +3,37 @@
   @use '../../lib/typography.scss' as type;
 
   main {
-    --tooltip-background-color: var(--DarkVibrant, #fff);
-    --tooltip-color: var(--DarkVibrantTextColor, var(--DarkColor));
+    --DarkColor: #252525;
+    --LightColor: #f9f9f9;
+
+    // Defaults to light mode
+    --TextColor: var(--DarkColor);
+    --BackgroundColor: var(--LightColor);
+    @media (prefers-color-scheme: dark) {
+      // Flips if user prefers dark mode
+      --TextColor: var(--LightColor);
+      --BackgroundColor: var(--DarkColor);
+    }
+
+    // Tooltip library's internal varibles for config
+    --tooltip-background-color: var(--DarkVibrant, var(--BackgroundColor));
+    --tooltip-color: var(--DarkVibrantTextColor, var(--TextColor));
     --tooltip-font-family: type.$base-font-stack;
 
     ::selection {
-      background-color: var(--LightVibrant, #000);
-      color: var(--LightVibrantTextColor, #fff);
+      background-color: var(--LightVibrant, var(--TextColor));
+      color: var(--LightVibrantTextColor, var(--BackgroundColor));
     }
 
     min-height: 100vh;
     padding: 1rem 3rem;
     box-sizing: border-box;
     position: relative;
-    background: linear-gradient(var(--DarkVibrant, #fff) 0, var(--DarkMuted, #fff) 125%);
-    color: var(--DarkVibrantTextColor, var(--DarkColor));
+    background: linear-gradient(var(--DarkVibrant, var(--BackgroundColor)) 0, var(--DarkMuted, var(--BackgroundColor)) 125%);
+    color: var(--DarkVibrantTextColor, var(--TextColor));
     transition: 0.25s;
 
-    @include type.base;
+    @include type.base;  // Base typography
 
     &.compare-available {
       @include override-for-larger-than(md-screen) {
@@ -64,6 +77,9 @@
 
     &.fresh-start {
       width: 75%;
+      @include override-for-smaller-than(md-screen) {
+        width: 90%;
+      }
     }
 
     .active-series-poster {
@@ -132,7 +148,9 @@
           height: 18rem;
           padding: 0.5rem;
           border-bottom-left-radius: 1.5rem;
-          justify-content: end;
+          &:not(.fresh-start) {
+            justify-content: end;
+          }
         }
         @include override-for-larger-than(md-screen) {
           background: linear-gradient(to right, transparent, var(--Muted) 25%) !important;
@@ -140,6 +158,9 @@
 
         .intro-text {
           font-size: 1.5rem;
+          @include override-for-smaller-than(md-screen) {
+            font-size: 1rem;
+          }
         }
 
         big {
@@ -244,8 +265,8 @@
     }
     &.compare-active {
       * {
-        background-color: #fff;
-        color: var(--DarkColor);
+        background-color: var(--BackgroundColor);
+        color: var(--TextColor);
       }
     }
   }
