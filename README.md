@@ -6,6 +6,4 @@ Total Runtime
 License
 -------
 
-All rights reserved.
-
-*Details to be added before repo is made public.*
+Copyright © 2024 Antriksh Yadav All Rights Reserved
