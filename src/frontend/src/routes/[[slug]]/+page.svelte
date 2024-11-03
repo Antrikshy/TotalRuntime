@@ -264,10 +264,7 @@
       }
     }
     &.compare-active {
-      * {
-        background-color: var(--BackgroundColor);
-        color: var(--TextColor);
-      }
+      display: none;
     }
   }
 </style>
@@ -334,19 +331,19 @@
   }
 
   function handleFoundSeriesMetadata(e) {
-    const series = e.detail
-    activeSeries = series
-    selectedSeries[series.tvdbId] = series
+    activeSeries = e.detail
   }
 
   function handleFoundSeriesEpisodes(e) {
-    // Function also updates selectedSeries by reference
     const episodes = e.detail
     activeSeries.episodesBySeason = {}
     if (!episodes.length) {
       return
     }
     activeSeries.totalRuntime = episodes.reduce((total, ep) => total + ep.runtime, 0)
+    // Adding to selectedSeries once episodes are found and total runtime is determined
+    // selectedSeries is used for the compare screen
+    selectedSeries[activeSeries.tvdbId] = activeSeries
     activeSeries.runtimeWasImputed = false
     episodes.forEach(ep => {
       const { season } = ep
