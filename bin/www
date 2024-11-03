@@ -18,8 +18,9 @@ FIRST_PORT=$1
 CORS_ORIGIN=$2
 TVDB_API_KEY=$3
 
+export NODE_ENV=development  # Necessary at build time
+
 # Set environment variables for production
-export NODE_ENV=development
 export PUBLIC_BACKEND_REVERSE_PROXY_PORT=$FIRST_PORT
 export BACKEND_INTERNAL_PORT=$((++FIRST_PORT))
 export FRONTEND_INTERNAL_PORT=$((++FIRST_PORT))
