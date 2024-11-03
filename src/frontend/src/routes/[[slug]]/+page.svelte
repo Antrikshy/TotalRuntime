@@ -424,12 +424,15 @@
   <meta property="og:site_name" content="Total Runtime" />
   <meta property="og:title" content={pageTitle} />
   <meta property="og:description" content={pageDescription} />
-  <meta property="og:type" content={activeSeries ? "video:tv_show" : "website"} />
 
   {#if activeSeries}
     <meta property="og:video:release_date" content={activeSeries.year} />
     <meta property="og:video:duration" content={activeSeries.totalRuntime ? activeSeries.totalRuntime * 60 : null} />
     <meta property="og:image" content={activeSeries.thumbnail} />
+    <meta property="og:type" content="video:tv_show" />
+  {:else}
+    <meta property="og:image" content="/og_image.png" />
+    <meta property="og:type" content="website" />
   {/if}
 </svelte:head>
 
