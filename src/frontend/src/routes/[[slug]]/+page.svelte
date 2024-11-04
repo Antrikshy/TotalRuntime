@@ -276,7 +276,7 @@
 
   import Vibrant from "node-vibrant"
   import { textContrast } from "text-contrast"
-  import { tooltip } from "@svelte-plugins/tooltips";
+  import { tooltip } from "@svelte-plugins/tooltips"
 
   import { humanizeRuntime } from "$lib/util.js"
 
@@ -396,6 +396,7 @@
     pageTitle = "Total Runtime"  // Reset
     pageDescription = "Find and compare how long it will take you to watch TV shows, by season or start to end."  // Reset
     if (activeSeries) {
+      // Get humanized runtime, color palette
       if (activeSeries.totalRuntime) {
         activeSeriesHumanizedRuntime = humanizeRuntime(activeSeries.totalRuntime)
         if (activeSeries.thumbnail) {
@@ -408,8 +409,11 @@
       } else {
         activeSeriesHumanizedRuntime = ""
       }
-      pageTitle = `"${activeSeries.title}" (${activeSeries.year}) - ${pageTitle}`
-      pageDescription = `How long will it take you to watch${activeSeries.episodesBySeason && Object.keys(activeSeries.episodesBySeason).length > 1 ? " all seasons of" : ""} "${activeSeries.title}" (${activeSeries.year})? Plus, find other shows to compare!`
+      // Set page title and description (latter for SEO)
+      const decoratedTitle = `"${activeSeries.title}"${activeSeries.year ? ` (${activeSeries.year})` : ""}`
+      const numSeasons = activeSeries.episodesBySeason ? Object.keys(activeSeries.episodesBySeason).length : null
+      pageTitle = `${decoratedTitle} - ${pageTitle}`
+      pageDescription = `How many weeks, days or hours will it take you to watch all ${numSeasons && numSeasons > 1 ? `${numSeasons} seasons` : "episodes"} of ${decoratedTitle}? Plus, find other shows to compare!`
     }
   }
 </script>

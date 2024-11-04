@@ -3,6 +3,8 @@ import cors from "@fastify/cors"
 import axios from "axios"
 import median from "just-median"
 
+import { generate as generateSitemap } from "./sitemap.js"
+
 const fastify = Fastify({
   logger: true
 })
@@ -136,6 +138,10 @@ fastify.get("/episodes", (request, reply) => {
     fastify.log.error(`/series/.../episodes/official failed: ${err.message}`, err)
     reply.code(500).send("Internal server error")
   })
+})
+
+fastify.get("/sitemap", async (request, reply) => {
+  reply.code(200).send(await generateSitemap(tvdb))
 })
 
 fastify.listen({ host: "::", port: process.env.BACKEND_INTERNAL_PORT }, (err) => {
