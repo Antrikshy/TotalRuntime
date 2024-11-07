@@ -48,11 +48,18 @@
   h1.logo {
     margin-top: 0;
     text-align: center;
-
     cursor: default;
 
     a {
       text-decoration: none;
+
+      &>:nth-child(1) {
+        @include type.regular-classy;
+      }
+      &>:nth-child(2) {
+        @include type.bold-classy;
+        font-size: 2.2rem;
+      }
     }
   }
 
@@ -430,11 +437,16 @@
   <meta property="og:description" content={pageDescription} />
 
   {#if activeSeries}
+    <link rel="canonical" href={`https://totalruntime.antrikshy.com/${activeSeries.tvdbId}-${activeSeries.slug}`}/>
+    <link rel="alternate" href={`https://totalruntime.antrikshy.com/${activeSeries.tvdbId}`}/>
+
     <meta property="og:video:release_date" content={activeSeries.year} />
     <meta property="og:video:duration" content={activeSeries.totalRuntime ? activeSeries.totalRuntime * 60 : null} />
     <meta property="og:image" content={activeSeries.thumbnail} />
     <meta property="og:type" content="video:tv_show" />
   {:else}
+    <link rel="canonical" href="https://totalruntime.antrikshy.com"/>
+
     <meta property="og:image" content="/og_image.png" />
     <meta property="og:type" content="website" />
   {/if}
@@ -451,7 +463,8 @@
   --DarkVibrantTextColor: {paletteDarkVibrantTextColor};
   --LightVibrantTextColor: {paletteLightVibrantTextColor};
 ">
-  <h1 class="logo"><a href="/" tabindex="-1">Total Runtime</a></h1>
+  <!-- spans used for styling the logo -->
+  <h1 class="logo"><a href="/" tabindex="-1"><span>Total</span> <span>Runtime</span></a></h1>
   {#if !inCompareMode}
     <div role="presentation" transition:scale={{ start: 0.8, opacity: 0.8 }}>
       <section class="top-area {activeSeries == null ? " fresh-start" : ""}">
