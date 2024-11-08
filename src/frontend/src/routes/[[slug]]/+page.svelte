@@ -256,18 +256,27 @@
   }
 
   footer {
-    width: 100%;
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
     position: absolute;
     left: 0;
     right: 0;
     bottom: 0;
     text-align: center;
     transition: 0.25s;
+    img {
+      vertical-align: middle;
+      height: 1.25rem;
+      transform: translateY(-3px);
+    }
     @include override-for-smaller-than(md-screen) {
+      padding: 0 3rem;
       font-size: small;
+      line-height: 0.8rem;
       &.compare-available {
         margin-bottom: 3rem;
+      }
+      img {
+        height: 1rem;
       }
     }
     &.compare-active {
@@ -447,7 +456,7 @@
   {:else}
     <link rel="canonical" href="https://totalruntime.antrikshy.com"/>
 
-    <meta property="og:image" content="/og_image.png" />
+    <meta property="og:image" content="/og-image.png" />
     <meta property="og:type" content="website" />
   {/if}
 </svelte:head>
@@ -549,6 +558,11 @@
     />
   {/if}
   <footer class={inCompareMode ? "compare-active" : "" + Object.keys(selectedSeries).length > 1 ? " compare-available" : ""}>
-    <small>Designed by <a href="https://antrikshy.com">Antriksh Yadav</a>. Source <a href="https://github.com/Antrikshy/TotalRuntime" target="_blank">on GitHub</a>. Data from <a href="https://thetvdb.com" target="_blank">TheTVDB</a>. Uses <a href="https://support.google.com/analytics/answer/6004245?sjid=1476110778839677937-NC" target="_blank">Google Analytics</a>.</small>
+    <small>
+      <picture>
+        <source srcset="/personal-insignia-dark.png" media="(prefers-color-scheme: dark)">
+        <img src={(activeSeries && !inCompareMode) ? "/personal-insignia-dark.png" : "/personal-insignia-light.png"} alt="Antriksh Yadav's personal insignia">
+      </picture>
+      Designed by <a href="https://antrikshy.com">Antriksh Yadav</a>. Source <a href="https://github.com/Antrikshy/TotalRuntime" target="_blank">on GitHub</a>. Data from <a href="https://thetvdb.com" target="_blank">TheTVDB</a>. Uses <a href="https://support.google.com/analytics/answer/6004245?sjid=1476110778839677937-NC" target="_blank">Google Analytics</a>.</small>
   </footer>
 </main>
