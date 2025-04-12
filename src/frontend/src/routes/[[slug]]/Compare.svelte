@@ -1,10 +1,11 @@
 <style lang="scss">
   @use '../../lib/responsive.scss' as *;
+  @use '../../lib/typography.scss' as type;
 
   .compare-screen {
     height: 100vh;
     width: 100vw;
-    padding: 5rem 3rem 15rem;
+    padding: 6rem 3rem 15rem;
     box-sizing: border-box;
     position: fixed;
     top: 0;
@@ -13,6 +14,7 @@
     background-color: var(--BackgroundColor);
     color: var(--DarkColor);
     @include override-for-smaller-than(md-screen) {
+      padding-top: 5rem;
       padding-left: 1.5rem;
       padding-right: 1.5rem;
     }
@@ -25,7 +27,21 @@
       justify-content: center;
     }
 
-    .top-right-buttons {
+    .top-left {
+      position: absolute;
+      top: 1.5rem;
+      left: 1.5rem;
+      @include type.regular-classy;
+      @include override-for-smaller-than(md-screen) {
+        font-size: smaller;
+      }
+
+      strong {
+        @include type.bold-classy;
+      }
+    }
+
+    .top-right {
       position: absolute;
       top: 1.5rem;
       right: 1.5rem;
@@ -41,6 +57,11 @@
         cursor: pointer;
         box-shadow:#00000080 0px 3px 6px;
         background-color: #fff;
+        @include override-for-smaller-than(md-screen) {
+          height: 1.5rem;
+          line-height: 1.75rem;
+          font-size: smaller;
+        }
       }
     }
 
@@ -59,7 +80,7 @@
       background-color: #fff;
       @include override-for-smaller-than(md-screen) {
         gap: 0.5rem;
-        bottom: 3rem;
+        bottom: 2rem;
       }
       @include override-for-larger-than(md-screen) {
         select {
@@ -110,11 +131,16 @@
   let sortedSummaries = []
   let sortMode = sortModes[0]
   let sortAscending = true
+  let totalCombinedRuntimeHumanized = ""
 
   $: sortedSummaries = Object.values(selectedSeries).sort((l, r) => {
     const [a, b] = sortAscending ? [l, r] : [r, l]
     return sortMode.fetcher(a) - sortMode.fetcher(b)
   })
+  $: {
+    const totalCombinedRuntime = Object.values(selectedSeries).reduce((total, series) => total += series.totalRuntime, 0)
+    totalCombinedRuntimeHumanized = humanizeRuntime(totalCombinedRuntime)
+  }
   $: if (!Object.keys(selectedSeries).length) {
     dispatch("closeCompareScreen")
   }
@@ -124,7 +150,14 @@
   class="compare-screen"
   transition:blur={{ duration: 500, delay: 100, amount: 10 }}
 >
-  <div class="top-right-buttons">
+  <div class="top-left">
+    <big>
+      Total <strong>Combined</strong> Runtime
+      <br/>
+      <strong>{totalCombinedRuntimeHumanized}</strong>
+    </big>
+  </div>
+  <div class="top-right">
     <button on:click={_ => {
       Object.values(selectedSeries).forEach(series => dispatch("deselectSeries", series.tvdbId))
       dispatch("closeCompareScreen")

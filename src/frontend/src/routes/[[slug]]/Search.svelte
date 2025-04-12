@@ -1,42 +1,64 @@
 <style lang="scss">
   @use '../../lib/responsive.scss' as *;
 
-  .search-bar {
-    height: 4rem;
-    width: 100%;
-    padding: 1rem;
+  .search-form {
     position: relative;
-    box-sizing: border-box;
-    border: none;
-    border-radius: 1rem;
-    font-size: 2rem;
-    font-family: inherit;
-    transition: 0.15s;
-    @include override-for-smaller-than(md-screen) {
-      height: 3rem;
-      font-size: 1.5rem;
-    }
-    @include override-for-smaller-than(sm-screen) {
-      height: 2.5rem;
-      font-size: 1.3rem;
-    }
-    &:not(.elevated):not(.fresh-start):not(.no-poster) {
-      border-radius: unset;
-      border-top-right-radius: 1rem;
+
+    .search-bar {
+      height: 4rem;
+      width: 100%;
+      padding: 1rem;
+      position: relative;
+      box-sizing: border-box;
+      border: none;
+      border-radius: 1rem;
+      font-size: 2rem;
+      font-family: inherit;
+      transition: 0.15s;
       @include override-for-smaller-than(md-screen) {
+        height: 3rem;
+        font-size: 1.5rem;
+      }
+      @include override-for-smaller-than(sm-screen) {
+        height: 2.5rem;
+        font-size: 1.3rem;
+      }
+      &:not(.elevated):not(.fresh-start):not(.no-poster) {
+        border-radius: unset;
+        border-top-right-radius: 1rem;
+        @include override-for-smaller-than(md-screen) {
+          border-top-left-radius: 1rem;
+        }
+      }
+      &:focus,
+      &.fresh-start {
+        outline: none;
+        box-shadow: #3b3b3b80 0px 3px 10px;
+      }
+      &.fresh-start {
+        margin-top: 25vh;
+      }
+      &.no-poster {
         border-top-left-radius: 1rem;
       }
     }
-    &:focus,
-    &.fresh-start {
-      outline: none;
-      box-shadow: #3b3b3b80 0px 3px 10px;
-    }
-    &.fresh-start {
-      margin-top: 25vh;
-    }
-    &.no-poster {
-      border-top-left-radius: 1rem;
+    .clear-search {
+      position: absolute;
+      line-height: 50%;
+      font-size: 1lh;
+      right: 0.5rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--DarkColor);
+      visibility: hidden;  // Only shows on smaller screens
+      @include override-for-smaller-than(md-screen) {
+        visibility: visible;
+        height: 3rem;
+      }
+      @include override-for-smaller-than(sm-screen) {
+        height: 2.5rem;
+      }
     }
   }
 
@@ -78,6 +100,8 @@
 
       .poster {
         height: 4rem;
+        aspect-ratio: 1/1.45;
+        background-color: lightslategray;
         @include override-for-smaller-than(sm-screen) {
           height: 3rem;
         }
@@ -155,11 +179,12 @@
   }
 </script>
 
-<form role="search" on:submit={e => {e.preventDefault(); fetchSearchResults();}}>
+<form class="search-form" role="search" on:submit={e => {e.preventDefault(); fetchSearchResults();}}>
   <!-- svelte-ignore a11y-autofocus -->
   <input
     type="text"
     class={`search-bar ${searchQuery.length || freshStart ? " elevated" : ""} ${freshStart ? " fresh-start" : ""} ${noPoster ? "no-poster" : ""}`}
+    id="search-bar"
     placeholder="Search for series"
     autofocus={freshStart}
     auAvoidtocomplete="off"
@@ -182,6 +207,20 @@
     }}
     on:input={debounce(fetchSearchResults, 500)}
   />
+  {#if searchQuery.length && !freshStart}
+    <button
+      class="clear-search"
+      type="button"
+      aria-label="Clear search"
+      aria-controls="search-bar"
+      on:click={() => {
+        searchQuery = "";
+        searchResults = [];
+      }}
+    >
+      ✕
+    </button>
+  {/if}
 </form>
 {#if searchResults.length}
   <div class="search-results">
