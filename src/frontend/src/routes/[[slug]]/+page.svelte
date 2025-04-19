@@ -268,6 +268,9 @@
       height: 1.25rem;
       transform: translateY(-3px);
     }
+    @include override-for-smaller-than(lg-screen) {
+      margin-bottom: 1.75rem;
+    }
     @include override-for-smaller-than(md-screen) {
       padding: 0 3rem;
       font-size: small;
