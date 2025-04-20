@@ -9,8 +9,8 @@
   "dependencies": {
     "@fastify/cookie": "^9.3.1",
     "@fastify/cors": "^8.0.0",
-    "axios": "^1.6.7",
-    "fastify": "^4.26.0",
+    "axios": "^1.8.4",
+    "fastify": "^4.29.0",
     "just-median": "^2.2.0"
   },
   "type": "module"

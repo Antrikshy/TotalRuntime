@@ -293,7 +293,7 @@
   import { goto, afterNavigate } from "$app/navigation"
   import { page } from "$app/stores"
 
-  import Vibrant from "node-vibrant"
+  import { Vibrant } from "node-vibrant/browser"
   import { textContrast } from "text-contrast"
   import { tooltip } from "@svelte-plugins/tooltips"
 

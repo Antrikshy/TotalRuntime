@@ -11,17 +11,17 @@
 		"@sveltejs/adapter-node": "^5.2.6",
 		"@sveltejs/kit": "^2.0.0",
 		"@sveltejs/vite-plugin-svelte": "^3.0.0",
-		"sass": "^1.70.0",
+		"sass": "^1.86.3",
 		"svelte": "^4.2.7",
-		"vite": "^5.0.3"
+		"vite": "^5.4.11"
 	},
 	"type": "module",
 	"dependencies": {
-		"@svelte-plugins/tooltips": "^3.0.0",
-		"axios": "^1.6.7",
-		"debounce": "^2.0.0",
-		"humanize-duration": "^3.31.0",
-		"node-vibrant": "^3.1.6",
+		"@svelte-plugins/tooltips": "^3.0.3",
+		"axios": "^1.8.4",
+		"debounce": "^2.2.0",
+		"humanize-duration": "^3.32.1",
+		"node-vibrant": "^4.0.3",
 		"text-contrast": "^1.0.2"
 	}
 }
