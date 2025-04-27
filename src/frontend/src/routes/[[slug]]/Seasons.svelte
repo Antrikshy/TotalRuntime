@@ -69,8 +69,7 @@
 
 <script>
   import { humanizeRuntime } from "$lib/util.js"
-
-  import { tooltip } from "@svelte-plugins/tooltips";
+  import { tippy } from "$lib/tooltips"
 
   export let activeSeriesEpisodesBySeason
 </script>
@@ -81,7 +80,7 @@
       <div><big>Season {seasonNum}</big></div>
       <div><small>
         {humanizeRuntime(season.totalRuntime)}{#if season.runtimeWasImputed}
-          <span class="help-text" tabindex="-1" title="This season's runtime had gaps that were filled in with approximation." use:tooltip={{animation: "slide"}}>*</span>
+          <span class="help-text" tabindex="-1" use:tippy={{content: "This season's runtime had gaps that were filled in with approximation."}}>*</span>
         {/if}
       </small></div>
       <div><small>{season.episodes.length} {`episode${season.episodes.length == 1 ? "" : "s"}`}</small></div>
@@ -92,11 +91,11 @@
           <strong>Episode {episode.episode}</strong>
           <br/>
           {#if episode.runtime}
-            <span class={episode.runtimeQuality != "fetchedRaw" ? "low-quality-runtime" : ""}>
-              {episode.runtime} minutes{#if episode.runtimeQuality == "fetchedAverage"}
-                <sup class="help-text" tabindex="-1" title="Inferred from official series average runtime, as episode runtime was unavailable." use:tooltip={{position: "left", animation: "slide"}}>1</sup>
-              {:else if episode.runtimeQuality == "computedAverage"}
-                <sup class="help-text" tabindex="-1" title="Computed median runtime for season, as episode runtime and official series average were unavailable." use:tooltip={{position: "left", animation: "slide"}}>2</sup>
+        <span class={episode.runtimeQuality != "fetchedRaw" ? "low-quality-runtime" : ""}>
+          {episode.runtime} minutes{#if episode.runtimeQuality == "fetchedAverage"}
+            <sup class="help-text" tabindex="-1" use:tippy={{content: "Inferred from official series average runtime, as episode runtime was unavailable."}}>1</sup>
+          {:else if episode.runtimeQuality == "computedAverage"}
+            <sup class="help-text" tabindex="-1" use:tippy={{content: "Computed median runtime for season, as episode runtime and official series average were unavailable."}}>2</sup>
               {/if}
             </span>
           {:else}

@@ -15,11 +15,6 @@
       --BackgroundColor: var(--DarkColor);
     }
 
-    // Tooltip library's internal varibles for config
-    --tooltip-background-color: var(--DarkVibrant, var(--BackgroundColor));
-    --tooltip-color: var(--DarkVibrantTextColor, var(--TextColor));
-    --tooltip-font-family: type.$base-font-stack;
-
     ::selection {
       background-color: var(--LightVibrant, var(--TextColor));
       color: var(--LightVibrantTextColor, var(--BackgroundColor));
@@ -32,6 +27,9 @@
     background: linear-gradient(var(--DarkVibrant, var(--BackgroundColor)) 0, var(--DarkMuted, var(--BackgroundColor)) 125%);
     color: var(--DarkVibrantTextColor, var(--TextColor));
     transition: 0.25s;
+    @include override-for-smaller-than(md-screen) {
+      padding: 1rem 1.5rem;
+    }
 
     @include type.base;  // Base typography
 
@@ -40,9 +38,17 @@
         padding-right: 4.5rem;
       }
     }
-    @include override-for-smaller-than(md-screen) {
-      padding: 1rem 1.5rem;
-    }
+  }
+
+  // For tooltips, initialized in $lib
+  :global(.tippy-box) {
+    padding: 0.35rem;
+    border-radius: 0.5rem;
+    font-size: small;
+    text-align: center;
+    box-shadow: #00000080 0px 2px 8px;
+    background-color: var(--DarkVibrant);
+    color: var(--DarkVibrantTextColor);
   }
 
   h1.logo {
@@ -295,7 +301,7 @@
 
   import { Vibrant } from "node-vibrant/browser"
   import { textContrast } from "text-contrast"
-  import { tooltip } from "@svelte-plugins/tooltips"
+  import { tippy } from "$lib/tooltips"
 
   import { humanizeRuntime } from "$lib/util.js"
 
@@ -508,7 +514,7 @@
                 <br/>
                 <strong>
                   {activeSeriesHumanizedRuntime}{#if activeSeries.runtimeWasImputed}
-                    <span class="help-text" tabindex="-1" title="This series' runtime had gaps that were filled in with approximation." use:tooltip={{animation: "slide"}}>*</span>
+                    <span class="help-text" tabindex="-1" use:tippy={{content: "This series' runtime had gaps that were filled in with approximation."}}>*</span>
                   {/if}
                   </strong>
                 <br/>
