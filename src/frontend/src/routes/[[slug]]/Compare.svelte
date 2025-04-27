@@ -12,7 +12,7 @@
     left: 0;
     overflow-y: scroll;
     background-color: var(--BackgroundColor);
-    color: var(--DarkColor);
+    color: var(--TextColor);
     @include override-for-smaller-than(md-screen) {
       padding-top: 5rem;
       padding-left: 1.5rem;
@@ -77,7 +77,8 @@
       transform: translateX(-50%);
       border-radius: 1rem;
       box-shadow:#00000080 0px 3px 10px;
-      background-color: #fff;
+      background-color: var(--LightColor);
+      color: var(--DarkColor);
       @include override-for-smaller-than(md-screen) {
         gap: 0.5rem;
         bottom: 2rem;
