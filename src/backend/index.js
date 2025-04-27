@@ -64,9 +64,16 @@ fastify.get("/series", (request, reply) => {
   tvdb.get(`/series/${tvdbId}/extended`, { params: { short: true } }).then(res => {
     const rawResult = res.data["data"]
     if (!rawResult) { reply.send(404) }
+    // Cleaning up title if release year is included in parentheses (often for disambiguation)
+    let seriesTitle = rawResult["translations"]?.["eng"] ?? rawResult["name"]
+    const seriesYear = rawResult["year"]
+    const yearInTitle = seriesTitle.match(/\((\d{4})\)$/)
+    if (yearInTitle && parseInt(yearInTitle[1], 10) == seriesYear) {
+      seriesTitle = seriesTitle.replace(/\s*\(\d{4}\)$/, "")
+    }
     reply.send({
-      "title": rawResult["translations"]?.["eng"] ?? rawResult["name"],
-      "year": rawResult["year"],
+      "title": seriesTitle,
+      "year": seriesYear,
       "tvdbId": rawResult["id"],
       "remoteIds": rawResult["remote_ids"],
       "thumbnail": rawResult["image"],
