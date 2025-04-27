@@ -79,6 +79,8 @@
 <script>
   import { createEventDispatcher } from "svelte"
 
+  import { tippy } from "$lib/tooltips"
+
   const dispatch = createEventDispatcher()
 
   export let seriesMetadata
@@ -91,7 +93,11 @@
     color: {seriesMetadata.summaryTextColor};
   ">
   <strong class="rank-indicator">{rank}</strong>
-  <button class="close-button" on:click={_ => dispatch("deselectSeries", seriesMetadata.tvdbId)}>✖</button>
+  <button
+    class="close-button"
+    use:tippy={{content: "Remove series from comparison."}}
+    on:click={_ => dispatch("deselectSeries", seriesMetadata.tvdbId)}
+  >✖</button>
   <div class="summary-text">
     <strong>{seriesMetadata.title}</strong>
     {context}

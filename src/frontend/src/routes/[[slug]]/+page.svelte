@@ -15,7 +15,7 @@
       --BackgroundColor: var(--DarkColor);
     }
 
-    ::selection {
+    :global(::selection) {
       background-color: var(--LightVibrant, var(--TextColor));
       color: var(--LightVibrantTextColor, var(--BackgroundColor));
     }
@@ -298,10 +298,10 @@
   import { scale, fly } from "svelte/transition"
   import { goto, afterNavigate } from "$app/navigation"
   import { page } from "$app/stores"
+  import { tippy } from "$lib/tooltips"
 
   import { Vibrant } from "node-vibrant/browser"
   import { textContrast } from "text-contrast"
-  import { tippy } from "$lib/tooltips"
 
   import { humanizeRuntime } from "$lib/util.js"
 
@@ -310,9 +310,12 @@
   import Compare from "./Compare.svelte"
 
   let activeSeries = null
+  let seriesMayBeAiring = false
+  let activeSeriesHumanizedRuntime = null
   let selectedSeries = {}
   let inCompareMode = false
   let pageTitle = "Total Runtime"
+  let pageDescription = null
 
   let searchQuery = ""
 
@@ -365,13 +368,14 @@
     if (!episodes.length) {
       return
     }
+    // Calculating series-level total runtime upfront
     activeSeries.totalRuntime = episodes.reduce((total, ep) => total + ep.runtime, 0)
-    // Adding to selectedSeries once episodes are found and total runtime is determined
-    // selectedSeries is used for the compare screen
-    selectedSeries[activeSeries.tvdbId] = activeSeries
     activeSeries.runtimeWasImputed = false
+    // Cumulative low-confidence runtime total at the end of the series, if applicable
+    let fuzzyTrailingRuntime = 0
     episodes.forEach(ep => {
       const { season } = ep
+      // Creating empty season to build upon
       if (!activeSeries.episodesBySeason[season]) {
         activeSeries.episodesBySeason[season] = {
           totalRuntime: 0,
@@ -379,13 +383,23 @@
           episodes: []
         }
       }
+      // Pushing each episode into season metadata
       activeSeries.episodesBySeason[season]["episodes"].push(ep)
       activeSeries.episodesBySeason[season]["totalRuntime"] += ep.runtime
       if (ep.runtimeQuality != "fetchedRaw") {
+        // Runtime is of low confidence
         activeSeries.runtimeWasImputed = true
         activeSeries.episodesBySeason[season]["runtimeWasImputed"] = true
+        fuzzyTrailingRuntime += ep.runtime
+      } else {
+        // Runtime is of high confidence
+        fuzzyTrailingRuntime = 0
       }
     })
+    // Represents catch-up runtime; may be airing if last episodes have low confidence runtimes
+    activeSeries.totalWatchableRuntime = activeSeries.totalRuntime - fuzzyTrailingRuntime
+    // Used for the compare screen
+    selectedSeries[activeSeries.tvdbId] = activeSeries
   }
 
   async function inferColorPalette() {
@@ -415,15 +429,16 @@
     paletteLightVibrantTextColor = undefined
   }
 
-  let pageDescription = null
-  let activeSeriesHumanizedRuntime = null
   $: {
     pageTitle = "Total Runtime"  // Reset
     pageDescription = "Find and compare how long it will take you to watch TV shows, by season or start to end."  // Reset
     if (activeSeries) {
+      seriesMayBeAiring = activeSeries.totalRuntime != activeSeries.totalWatchableRuntime
       // Get humanized runtime, color palette
       if (activeSeries.totalRuntime) {
-        activeSeriesHumanizedRuntime = humanizeRuntime(activeSeries.totalRuntime)
+        activeSeriesHumanizedRuntime = seriesMayBeAiring
+          ? humanizeRuntime(activeSeries.totalWatchableRuntime)
+          : humanizeRuntime(activeSeries.totalRuntime)
         if (activeSeries.thumbnail) {
           inferColorPalette()
           activeSeries.summaryBackgroundColor = paletteLightVibrant
@@ -514,11 +529,18 @@
                 <br/>
                 <strong>
                   {activeSeriesHumanizedRuntime}{#if activeSeries.runtimeWasImputed}
-                    <span class="help-text" tabindex="-1" use:tippy={{content: "This series' runtime had gaps that were filled in with approximation."}}>*</span>
+                    <span
+                      class="help-text"
+                      tabindex="-1"
+                      use:tippy={{content: seriesMayBeAiring
+                        ? "Series may currently be airing. This is estimated time to catch up with the latest episode."
+                        : "This series' runtime had gaps that were filled in with approximation."
+                      }}
+                    >*</span>
                   {/if}
                   </strong>
                 <br/>
-                <span>to watch</span>
+                <span>to {seriesMayBeAiring ? "catch up with" : "watch"}</span>
                 <br/>
                 <span><strong>{activeSeries.title}</strong> <small>({activeSeries.year})</small></span>
               </big>
