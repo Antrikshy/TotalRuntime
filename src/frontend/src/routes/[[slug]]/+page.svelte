@@ -373,6 +373,8 @@
     activeSeries.runtimeWasImputed = false
     // Cumulative low-confidence runtime total at the end of the series, if applicable
     let fuzzyTrailingRuntime = 0
+    // Season numbers that were included in fuzzy trailing runtime, if applicable
+    let fuzzySeasons = new Set()
     episodes.forEach(ep => {
       const { season } = ep
       // Creating empty season to build upon
@@ -380,6 +382,7 @@
         activeSeries.episodesBySeason[season] = {
           totalRuntime: 0,
           runtimeWasImputed: false,
+          mayBeAiring: false,
           episodes: []
         }
       }
@@ -391,13 +394,21 @@
         activeSeries.runtimeWasImputed = true
         activeSeries.episodesBySeason[season]["runtimeWasImputed"] = true
         fuzzyTrailingRuntime += ep.runtime
+        fuzzySeasons.add(season)
       } else {
-        // Runtime is of high confidence
+        // Runtime is of high confidence; any fuzziness before was a gap
         fuzzyTrailingRuntime = 0
+        fuzzySeasons = new Set()
       }
     })
     // Represents catch-up runtime; may be airing if last episodes have low confidence runtimes
     activeSeries.totalWatchableRuntime = activeSeries.totalRuntime - fuzzyTrailingRuntime
+    seriesMayBeAiring = activeSeries.totalRuntime != activeSeries.totalWatchableRuntime
+    if (fuzzySeasons.size) {
+      fuzzySeasons.forEach(season => {
+        activeSeries.episodesBySeason[season]["mayBeAiring"] = true
+      })
+    }
     // Used for the compare screen
     selectedSeries[activeSeries.tvdbId] = activeSeries
   }
@@ -433,7 +444,6 @@
     pageTitle = "Total Runtime"  // Reset
     pageDescription = "Find and compare how long it will take you to watch TV shows, by season or start to end."  // Reset
     if (activeSeries) {
-      seriesMayBeAiring = activeSeries.totalRuntime != activeSeries.totalWatchableRuntime
       // Get humanized runtime, color palette
       if (activeSeries.totalRuntime) {
         activeSeriesHumanizedRuntime = seriesMayBeAiring

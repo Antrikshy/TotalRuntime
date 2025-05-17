@@ -79,7 +79,9 @@
     <summary class="season-summary">
       <div><big>Season {seasonNum}</big></div>
       <div><small>
-        {humanizeRuntime(season.totalRuntime)}{#if season.runtimeWasImputed}
+        {humanizeRuntime(season.totalRuntime)}{#if season.mayBeAiring}
+          <span class="help-text" tabindex="-1" use:tippy={{content: "This season may be airing or coming soon. Some episode runtimes were approximated."}}>*</span>
+        {:else if season.runtimeWasImputed}
           <span class="help-text" tabindex="-1" use:tippy={{content: "This season's runtime had gaps that were filled in with approximation."}}>*</span>
         {/if}
       </small></div>
