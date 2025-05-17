@@ -65,7 +65,9 @@ fastify.get("/series", (request, reply) => {
     const rawResult = res.data["data"]
     if (!rawResult) { reply.send(404) }
     // Cleaning up title if release year is included in parentheses (often for disambiguation)
-    let seriesTitle = rawResult["translations"]?.["eng"] ?? rawResult["name"]
+    let seriesTitle =
+      rawResult["translations"]?.["nameTranslations"]?.find(t => t.language === "eng" && t.name)?.name
+      ?? rawResult["name"]
     const seriesYear = rawResult["year"]
     const yearInTitle = seriesTitle.match(/\((\d{4})\)$/)
     if (yearInTitle && parseInt(yearInTitle[1], 10) == seriesYear) {
