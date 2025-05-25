@@ -1,7 +1,8 @@
 {
   "name": "totalruntime",
   "version": "1.0.0",
-  "description": "",
+  "description": "Web app to check and compare how long it will take you to watch or catch up to TV shows, by season or start to end.",
+  "private": true,
   "scripts": {
     "backend": "nodemon --exec \"npm start -w backend\"",
     "frontend": "npm run dev -w frontend",
