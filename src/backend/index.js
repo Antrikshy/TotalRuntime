@@ -87,7 +87,7 @@ fastify.get("/series", (request, reply) => {
   })
 })
 
-fastify.get("/episodes", (request, reply) => {
+fastify.get("/episodes", async (request, reply) => {
   const tvdbId = request.query.id
   if (!tvdbId || isNaN(tvdbId)) { reply.code(404).send() }
   function _imputeRuntimes(compactEpisodes, averageRuntime) {
@@ -122,31 +122,46 @@ fastify.get("/episodes", (request, reply) => {
       })
     }
   }
-  tvdb.get(`/series/${tvdbId}/episodes/official`, { params: { page: 0 } }).then(res => {
-    const compactEpisodes = res.data["data"]?.["episodes"]
-      .filter(episode =>
-        // Skipping season 0 (often bonus content)
-        episode["seasonNumber"] && episode["seasonNumber"] != 0
-      )
-      .map(episode => ({
-        "season": episode["seasonNumber"],
-        "episode": episode["number"],
-        "runtime": episode["runtime"],
-        "runtimeQuality": episode["runtime"] ? "fetchedRaw" : ""  // Blanks will be populated during imputation
-      }))
-    if (compactEpisodes.some(episode => !episode["runtime"])) {
-      // If any of the episodes is missing runtime
-      _imputeRuntimes(compactEpisodes, res.data["data"]?.["series"]?.["averageRuntime"])
-    }
-    if (compactEpisodes.length) {
-      reply.send(compactEpisodes)
-    } else {
-      reply.code(204).send()
-    }
-  }).catch(err => {
-    fastify.log.error(`/series/.../episodes/official failed: ${err.message}`, err)
-    reply.code(500).send("Internal server error")
-  })
+  // Making paginated calls without available page indicators
+  let page = 0
+  let hasMorePages = true
+  const allCompactEpisodes = []  // Collects results
+  while (hasMorePages) {
+    await tvdb.get(`/series/${tvdbId}/episodes/official`, { params: { page: page } }).then(res => {
+      const responseEpisodes = res.data["data"]?.["episodes"]
+      // Pagination stuff
+      if (responseEpisodes && responseEpisodes.length > 0) {
+        page++;
+      } else {
+        hasMorePages = false;
+      }
+      const compactEpisodes = responseEpisodes
+        .filter(episode =>
+          // Skipping season 0 (often bonus content)
+          episode["seasonNumber"] && episode["seasonNumber"] != 0
+        )
+        .map(episode => ({
+          "season": episode["seasonNumber"],
+          "episode": episode["number"],
+          "runtime": episode["runtime"],
+          "runtimeQuality": episode["runtime"] ? "fetchedRaw" : ""  // Blanks will be populated during imputation
+        }))
+      if (compactEpisodes.some(episode => !episode["runtime"])) {
+        // If any of the episodes is missing runtime
+        _imputeRuntimes(compactEpisodes, res.data["data"]?.["series"]?.["averageRuntime"])
+      }
+      allCompactEpisodes.push(...compactEpisodes)  // Collecting this page's processed episodes
+    }).catch(err => {
+      fastify.log.error(`/series/.../episodes/official failed: ${err.message}`, err)
+      reply.code(500).send("Internal server error")
+    })
+  }
+  // Response after any and all pagination is done
+  if (allCompactEpisodes.length) {
+    reply.send(allCompactEpisodes)
+  } else {
+    reply.code(204).send()
+  }
 })
 
 fastify.get("/sitemap", async (request, reply) => {
